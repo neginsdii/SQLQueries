@@ -655,3 +655,114 @@ WHERE EXISTS (
     HAVING COUNT(o.OrderID) > 1
        AND MAX(o.Amount) > 400
 );
+
+-- CASE
+
+-- 71.Show OrderID, Amount, and OrderCategory
+SELECT OrderID, Amount,
+    CASE
+        WHEN Amount > 500 THEN 'High'
+        WHEN Amount BETWEEN 200 AND 500 THEN 'Medium'
+        WHEN Amount < 200 THEN 'Low'
+    END AS OrderCategory
+FROM Orders;
+
+-- 72.Show FirstName, Country, and CustomerType
+SELECT FirstName, Country,
+    CASE
+        WHEN Country = 'Canada' THEN 'Domestic'
+        ELSE 'International'
+    END AS CustomerType
+FROM Customers;
+
+-- 73.Show OrderID, Amount, and Discount
+SELECT OrderID, Amount,
+    CASE
+        WHEN Amount > 500 THEN 20
+        WHEN Amount BETWEEN 300 AND 500 THEN 10
+        ELSE 0
+    END AS Discount
+FROM Orders;
+
+-- 74.Show OrderID, Amount, and PriceLevel
+SELECT OrderID, Amount,
+    CASE
+        WHEN Amount >= 500 THEN 'Expensive'
+        ELSE 'Affordable'
+    END AS PriceLevel
+FROM Orders;
+
+-- 75.Count orders greater than 300 for each customer
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount > 300 THEN 1 END) AS TotalOrders
+FROM Orders
+GROUP BY CustomerID;
+
+-- 76.Count expensive orders and other orders for each customer
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount >= 500 THEN 1 END) AS ExpensiveOrders,
+    COUNT(CASE WHEN Amount < 500 THEN 1 END) AS OtherOrders
+FROM Orders
+GROUP BY CustomerID;
+
+-- 77.Total amount spent only on orders greater than 300
+SELECT CustomerID,
+    SUM(CASE WHEN Amount > 300 THEN Amount END) AS HighValueTotal
+FROM Orders
+GROUP BY CustomerID;
+
+-- 78.Total orders above 300 and orders 300 or less separately
+SELECT CustomerID,
+    SUM(CASE WHEN Amount > 300 THEN Amount END) AS HighValueTotal,
+    SUM(CASE WHEN Amount <= 300 THEN Amount END) AS LowValueTotal
+FROM Orders
+GROUP BY CustomerID;
+
+-- 79.Categorize each customer's total spending
+SELECT CustomerID,
+    SUM(Amount) AS TotalSpending,
+    CASE
+        WHEN SUM(Amount) > 700 THEN 'High'
+        WHEN SUM(Amount) BETWEEN 400 AND 700 THEN 'Medium'
+        ELSE 'Low'
+    END AS SpendingLevel
+FROM Orders
+GROUP BY CustomerID;
+
+-- 80.Categorize each customer's average order amount
+SELECT CustomerID,
+    AVG(Amount) AS AVGSpending,
+    CASE
+        WHEN AVG(Amount) > 400 THEN 'High'
+        WHEN AVG(Amount) BETWEEN 250 AND 400 THEN 'Medium'
+        ELSE 'Low'
+    END AS AverageLevel
+FROM Orders
+GROUP BY CustomerID;
+
+-- 81.Categorize customers by number of orders
+SELECT CustomerID,
+    CASE
+        WHEN COUNT(OrderID) > 2 THEN 'Frequent'
+        WHEN COUNT(OrderID) = 2 THEN 'Regular'
+        WHEN COUNT(OrderID) = 1 THEN 'Occasional'
+    END AS OrderActivity
+FROM Orders
+GROUP BY CustomerID;
+
+-- 82.Show number of orders and ActivityLevel
+SELECT CustomerID,
+    COUNT(OrderID) AS NumOfOrders,
+    CASE
+        WHEN COUNT(OrderID) >= 3 THEN 'High'
+        WHEN COUNT(OrderID) = 2 THEN 'Medium'
+        ELSE 'Low'
+    END AS ActivityLevel
+FROM Orders
+GROUP BY CustomerID;
+
+-- 83.Count orders greater than 250 for each customer
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount > 250 THEN 1 END) AS OrdersAbove250
+FROM Orders
+GROUP BY CustomerID;
