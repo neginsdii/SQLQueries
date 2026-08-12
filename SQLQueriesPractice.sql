@@ -766,3 +766,84 @@ SELECT CustomerID,
     COUNT(CASE WHEN Amount > 250 THEN 1 END) AS OrdersAbove250
 FROM Orders
 GROUP BY CustomerID;
+
+-- 84.Total amount of orders 300 or greater for each customer
+SELECT CustomerID,
+    SUM(CASE WHEN Amount >= 300 THEN Amount END) AS TotalAbove300
+FROM Orders
+GROUP BY CustomerID;
+
+-- 85.Count orders below 300 and total amount of orders 300 or greater
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount < 300 THEN 1 END) AS SmallOrders,
+    SUM(CASE WHEN Amount >= 300 THEN Amount END) AS LargeOrderTotal
+FROM Orders
+GROUP BY CustomerID;
+
+-- 86.Show total spending and categorize customer level
+SELECT CustomerID,
+    SUM(Amount) AS TotalSpending,
+    CASE
+        WHEN SUM(Amount) > 700 THEN 'VIP'
+        WHEN SUM(Amount) BETWEEN 400 AND 700 THEN 'Regular'
+        WHEN SUM(Amount) < 400 THEN 'Basic'
+    END AS CustomerLevel
+FROM Orders
+GROUP BY CustomerID;
+
+-- 87.Count orders above 400, orders 400 or less, and show total spending
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount > 400 THEN 1 END) AS HighOrders,
+    COUNT(CASE WHEN Amount <= 400 THEN 1 END) AS NormalOrders,
+    SUM(Amount) AS TotalSpending
+FROM Orders
+GROUP BY CustomerID;
+
+-- 88.Count and total orders between 200 and 500
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount BETWEEN 200 AND 500 THEN 1 END) AS MediumOrders,
+    SUM(CASE WHEN Amount BETWEEN 200 AND 500 THEN Amount END) AS MediumOrderTotal
+FROM Orders
+GROUP BY CustomerID;
+
+-- 89.Count Low, Medium, and High orders
+SELECT CustomerID,
+    COUNT(CASE WHEN Amount < 200 THEN 1 END) AS LowOrders,
+    COUNT(CASE WHEN Amount BETWEEN 200 AND 500 THEN 1 END) AS MediumOrders,
+    COUNT(CASE WHEN Amount > 500 THEN 1 END) AS HighOrders
+FROM Orders
+GROUP BY CustomerID;
+
+-- 90.Show total spending, number of orders, and customer status
+SELECT CustomerID,
+    SUM(Amount) AS TotalSpending,
+    COUNT(OrderID) AS NumberOfOrders,
+    CASE
+        WHEN SUM(Amount) > 700 AND COUNT(OrderID) >= 3 THEN 'VIP'
+        ELSE 'Regular'
+    END AS CustomerStatus
+FROM Orders
+GROUP BY CustomerID;
+
+-- 91.Show average order amount, number of orders, and customer type
+SELECT CustomerID,
+    AVG(Amount) AS AverageAmount,
+    COUNT(OrderID) AS NumberOfOrders,
+    CASE
+        WHEN AVG(Amount) > 300 AND COUNT(OrderID) > 1 THEN 'Premium'
+        ELSE 'Standard'
+    END AS CustomerType
+FROM Orders
+GROUP BY CustomerID;
+
+-- 92.Show total spending and spending category; only customers spending over 500
+SELECT CustomerID,
+    SUM(Amount) AS TotalSpending,
+    CASE
+        WHEN SUM(Amount) > 700 THEN 'High'
+        WHEN SUM(Amount) BETWEEN 400 AND 700 THEN 'Medium'
+        ELSE 'Low'
+    END AS SpendingCategory
+FROM Orders
+GROUP BY CustomerID
+HAVING SUM(Amount) > 500;
