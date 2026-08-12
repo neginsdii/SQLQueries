@@ -432,3 +432,226 @@ HAVING SUM(o.Amount) > (
         GROUP BY CustomerID
     ) AS CustomerTotals
 );
+
+-- 53.Customers whose total spending is less than the highest customer total spending
+SELECT c.FirstName, SUM(o.Amount) AS TotalSpent
+FROM Customers AS c
+JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.FirstName
+HAVING SUM(o.Amount) < (
+    SELECT MAX(CustomerTotal)
+    FROM (
+        SELECT SUM(oo.Amount) AS CustomerTotal
+        FROM Orders AS oo
+        GROUP BY oo.CustomerID
+    ) AS CustomerTotals
+);
+
+-- 54.Customers with the second-highest total spending
+SELECT c.FirstName, SUM(o.Amount) AS TotalSpent
+FROM Customers AS c
+JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.FirstName
+HAVING SUM(o.Amount) = (
+    SELECT TOP 1 TotalAmount
+    FROM (
+        SELECT CustomerID, SUM(Amount) AS TotalAmount
+        FROM Orders
+        GROUP BY CustomerID
+    ) AS CustomerTotals
+    WHERE TotalAmount < (
+        SELECT MAX(TotalAmount)
+        FROM (
+            SELECT CustomerID, SUM(Amount) AS TotalAmount
+            FROM Orders
+            GROUP BY CustomerID
+        ) AS AllTotals
+    )
+    ORDER BY TotalAmount DESC
+);
+
+-- 55.Customers above average total spending but below highest total spending
+SELECT c.FirstName, SUM(o.Amount) AS TotalSpent
+FROM Customers AS c
+JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.FirstName
+HAVING SUM(o.Amount) > (
+    SELECT AVG(CustomerTotal)
+    FROM (
+        SELECT SUM(Amount) AS CustomerTotal
+        FROM Orders
+        GROUP BY CustomerID
+    ) AS CustomerTotals
+)
+AND SUM(o.Amount) < (
+    SELECT MAX(CustomerTotal)
+    FROM (
+        SELECT SUM(Amount) AS CustomerTotal
+        FROM Orders
+        GROUP BY CustomerID
+    ) AS CustomerTotals
+);
+
+-- 56.Customers who spent more in total than customer 2
+SELECT c.FirstName, SUM(o.Amount) AS TotalSpending
+FROM Customers AS c
+JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.FirstName
+HAVING SUM(o.Amount) > (
+    SELECT SUM(Amount)
+    FROM Orders
+    WHERE CustomerID = 2
+);
+
+-- 57.Customers with more orders than customer 2
+SELECT c.FirstName, COUNT(o.OrderID) AS NumberOfOrders
+FROM Customers AS c
+JOIN Orders AS o ON c.CustomerID = o.CustomerID
+GROUP BY c.FirstName
+HAVING COUNT(o.OrderID) > (
+    SELECT COUNT(oo.OrderID)
+    FROM Orders AS oo
+    WHERE oo.CustomerID = 2
+);
+
+-- 58.Customers who have at least one order using EXISTS
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+);
+
+-- 59.Customers who never placed an order using NOT EXISTS
+SELECT c.FirstName
+FROM Customers AS c
+WHERE NOT EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+);
+
+-- 60.Customers with at least one order greater than 400
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 400
+);
+
+-- 61.Customers who do not have any order greater than 400
+SELECT c.FirstName
+FROM Customers AS c
+WHERE NOT EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 400
+);
+
+-- 62.Customers with at least one order between 200 and 500
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount BETWEEN 200 AND 500
+);
+
+-- 63.Customers with an order greater than the average of all orders
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > (
+          SELECT AVG(oo.Amount) FROM Orders AS oo
+      )
+);
+
+-- 64.Customers with no orders OR at least one order greater than 600
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 600
+)
+OR NOT EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+);
+
+-- 65.Customers with at least one order over 200 and no order over 500
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 200
+)
+AND NOT EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 500
+);
+
+-- 66.Customers with at least one order below 300 and one above 400
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount < 300
+)
+AND EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount > 400
+);
+
+-- 67.Customers with at least one order but no orders below 200
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+)
+AND NOT EXISTS (
+    SELECT 1 FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+      AND o.Amount < 200
+);
+
+-- 68.Customers with at least two orders
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1
+    FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+    GROUP BY o.CustomerID
+    HAVING COUNT(o.OrderID) >= 2
+);
+
+-- 69.Customers with exactly one order
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1
+    FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+    GROUP BY o.CustomerID
+    HAVING COUNT(o.OrderID) = 1
+);
+
+-- 70.Customers with more than one order and largest order greater than 400
+SELECT c.FirstName
+FROM Customers AS c
+WHERE EXISTS (
+    SELECT 1
+    FROM Orders AS o
+    WHERE c.CustomerID = o.CustomerID
+    GROUP BY o.CustomerID
+    HAVING COUNT(o.OrderID) > 1
+       AND MAX(o.Amount) > 400
+);
