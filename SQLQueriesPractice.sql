@@ -908,3 +908,48 @@ SELECT SupplierName, Country, 'Supplier' FROM Suppliers;
 SELECT FirstName AS Name, Country, 'Customer' AS Type FROM Customers WHERE Country = 'Canada'
 UNION ALL
 SELECT SupplierName, Country, 'Supplier' FROM Suppliers WHERE Country = 'USA' OR Country = 'Germany';
+
+-- CTEs (Common Table Expressions)
+
+-- 104.Create CustomerTotals CTE and return customers whose total spending is greater than 600
+WITH CustomerTotals AS
+(
+    SELECT
+        CustomerID,
+        SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT *
+FROM CustomerTotals
+WHERE TotalSpending > 600;
+
+-- 105.Create CustomerOrders CTE and return customers with at least 2 orders
+WITH CustomerOrders AS
+(
+    SELECT
+        CustomerID,
+        COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT *
+FROM CustomerOrders
+WHERE NumberOfOrders >= 2;
+
+-- 106.Create CustomerStats CTE and return customers whose total spending is greater than 600
+-- and who have at least 2 orders
+WITH CustomerStats AS
+(
+    SELECT
+        CustomerID,
+        SUM(Amount) AS TotalSpending,
+        AVG(Amount) AS AverageAmount,
+        COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT *
+FROM CustomerStats
+WHERE TotalSpending > 600
+  AND NumberOfOrders >= 2;
