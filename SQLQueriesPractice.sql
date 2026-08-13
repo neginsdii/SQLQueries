@@ -847,3 +847,64 @@ SELECT CustomerID,
 FROM Orders
 GROUP BY CustomerID
 HAVING SUM(Amount) > 500;
+
+-- 93.Show total spending, number of orders, and customer status; only customers with at least 2 orders
+SELECT CustomerID, SUM(Amount) AS TotalSpending, COUNT(OrderID) AS NumberOfOrders,
+CASE WHEN SUM(Amount) > 600 AND COUNT(OrderID) >= 2 THEN 'Active' ELSE 'Normal' END AS CustomerStatus
+FROM Orders GROUP BY CustomerID HAVING COUNT(OrderID) >= 2;
+
+-- 94.Show total spending, high orders, and customer category
+SELECT CustomerID, SUM(Amount) AS TotalSpending,
+COUNT(CASE WHEN Amount > 300 THEN 1 END) AS HighOrders,
+CASE WHEN SUM(Amount) > 600 AND COUNT(CASE WHEN Amount > 300 THEN 1 END) >= 2 THEN 'Priority' ELSE 'Standard' END AS CustomerCategory
+FROM Orders GROUP BY CustomerID;
+
+-- 95.Show total spending, high-value total, and spending type; only customers spending at least 500
+SELECT CustomerID, SUM(Amount) AS TotalSpending,
+SUM(CASE WHEN Amount > 300 THEN Amount END) AS HighValueTotal,
+CASE WHEN SUM(CASE WHEN Amount > 300 THEN Amount END) > 500 THEN 'High Value' ELSE 'Normal' END AS SpendingType
+FROM Orders GROUP BY CustomerID HAVING SUM(Amount) >= 500;
+
+-- 96.Show number of orders, high orders, and order profile; only customers with at least 2 orders
+SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders,
+COUNT(CASE WHEN Amount > 300 THEN 1 END) AS HighOrders,
+CASE WHEN COUNT(CASE WHEN Amount > 300 THEN 1 END) >= 2 THEN 'High Activity' ELSE 'Normal' END AS OrderProfile
+FROM Orders GROUP BY CustomerID HAVING COUNT(OrderID) >= 2;
+
+-- 97.Show total spending, number of orders, high orders, and customer rank
+SELECT CustomerID, SUM(Amount) AS TotalSpending, COUNT(OrderID) AS NumberOfOrders,
+COUNT(CASE WHEN Amount > 300 THEN 1 END) AS HighOrders,
+CASE WHEN SUM(Amount) > 700 AND COUNT(OrderID) >= 2 THEN 'Gold'
+WHEN SUM(Amount) >= 500 OR COUNT(CASE WHEN Amount > 300 THEN 1 END) >= 1 THEN 'Silver'
+ELSE 'Bronze' END AS CustomerRank
+FROM Orders GROUP BY CustomerID HAVING SUM(Amount) >= 300;
+
+-- 98.Return all customer and supplier names with duplicates removed
+SELECT FirstName FROM Customers
+UNION
+SELECT SupplierName FROM Suppliers;
+
+-- 99.Return all customer and supplier names and keep duplicates
+SELECT FirstName FROM Customers
+UNION ALL
+SELECT SupplierName FROM Suppliers;
+
+-- 100.Return name and country for all customers and suppliers; keep duplicates
+SELECT FirstName, Country FROM Customers
+UNION ALL
+SELECT SupplierName, Country FROM Suppliers;
+
+-- 101.Return Canadian customers and suppliers; remove duplicate rows
+SELECT FirstName AS Name, Country FROM Customers WHERE Country = 'Canada'
+UNION
+SELECT SupplierName, Country FROM Suppliers WHERE Country = 'Canada';
+
+-- 102.Return all customers and suppliers with Name, Country, and Type
+SELECT FirstName AS Name, Country, 'Customer' AS Type FROM Customers
+UNION ALL
+SELECT SupplierName, Country, 'Supplier' FROM Suppliers;
+
+-- 103.Return Canadian customers and USA/Germany suppliers with Name, Country, and Type
+SELECT FirstName AS Name, Country, 'Customer' AS Type FROM Customers WHERE Country = 'Canada'
+UNION ALL
+SELECT SupplierName, Country, 'Supplier' FROM Suppliers WHERE Country = 'USA' OR Country = 'Germany';
