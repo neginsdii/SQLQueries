@@ -1168,3 +1168,231 @@ SELECT
 FROM Customers AS c
 JOIN QualifiedCustomers AS q
     ON c.CustomerID = q.CustomerID;
+
+
+-- ============================================
+-- RECURSIVE CTEs
+-- Questions 119–135
+-- ============================================
+
+-- 119. Generate numbers 1 through 6
+WITH Numbers AS
+(
+    SELECT 1 AS Number
+    UNION ALL
+    SELECT Number + 1
+    FROM Numbers
+    WHERE Number < 6
+)
+SELECT * FROM Numbers;
+
+-- 120. Generate even numbers 2 through 10
+WITH EvenNumbers AS
+(
+    SELECT 2 AS Number
+    UNION ALL
+    SELECT Number + 2
+    FROM EvenNumbers
+    WHERE Number < 10
+)
+SELECT * FROM EvenNumbers;
+
+-- 121. Countdown from 5 to 1
+WITH Countdown AS
+(
+    SELECT 5 AS Number
+    UNION ALL
+    SELECT Number - 1
+    FROM Countdown
+    WHERE Number > 1
+)
+SELECT * FROM Countdown;
+
+-- 122. Multiples of five from 5 through 30
+WITH MultiplesOfFive AS
+(
+    SELECT 5 AS Number
+    UNION ALL
+    SELECT Number + 5
+    FROM MultiplesOfFive
+    WHERE Number < 30
+)
+SELECT * FROM MultiplesOfFive;
+
+-- 123. Odd numbers from 1 through 11
+WITH OddNumbers AS
+(
+    SELECT 1 AS Number
+    UNION ALL
+    SELECT Number + 2
+    FROM OddNumbers
+    WHERE Number < 11
+)
+SELECT * FROM OddNumbers;
+
+-- 124. Countdown by three
+WITH CountdownByThree AS
+(
+    SELECT 15 AS Number
+    UNION ALL
+    SELECT Number - 3
+    FROM CountdownByThree
+    WHERE Number >= 6
+)
+SELECT * FROM CountdownByThree;
+
+-- 125. Generate 10, 20, 30 ... 70
+WITH Sequence AS
+(
+    SELECT 10 AS Number
+    UNION ALL
+    SELECT Number + 10
+    FROM Sequence
+    WHERE Number <= 60
+)
+SELECT * FROM Sequence;
+
+-- 126. Generate 20, 16, 12, 8, 4
+WITH DescendingNumbers AS
+(
+    SELECT 20 AS Number
+    UNION ALL
+    SELECT Number - 4
+    FROM DescendingNumbers
+    WHERE Number >= 8
+)
+SELECT * FROM DescendingNumbers;
+
+-- 127. Generate 3, 6, 12, 24, 48
+WITH Sequence AS
+(
+    SELECT 3 AS Number
+    UNION ALL
+    SELECT Number * 2
+    FROM Sequence
+    WHERE Number <= 24
+)
+SELECT * FROM Sequence;
+
+-- 128. Generate 100, 50, 25, 12, 6, 3, 1
+WITH Sequence AS
+(
+    SELECT 100 AS Number
+    UNION ALL
+    SELECT Number / 2
+    FROM Sequence
+    WHERE Number >= 3
+)
+SELECT * FROM Sequence;
+
+-- 129. Sophia and everyone underneath Sophia
+WITH EmployeeHierarchy AS
+(
+    SELECT EmployeeID, Name, ManagerID
+    FROM Employees
+    WHERE EmployeeID = 3
+
+    UNION ALL
+
+    SELECT e.EmployeeID, e.Name, e.ManagerID
+    FROM Employees AS e
+    JOIN EmployeeHierarchy AS eh
+        ON e.ManagerID = eh.EmployeeID
+)
+SELECT * FROM EmployeeHierarchy;
+
+-- 130. Liam and everyone underneath Liam
+WITH EmployeeHierarchy AS
+(
+    SELECT EmployeeID, Name, ManagerID
+    FROM Employees
+    WHERE EmployeeID = 2
+
+    UNION ALL
+
+    SELECT e.EmployeeID, e.Name, e.ManagerID
+    FROM Employees AS e
+    JOIN EmployeeHierarchy AS eh
+        ON e.ManagerID = eh.EmployeeID
+)
+SELECT * FROM EmployeeHierarchy;
+
+-- 131. Noah and everyone underneath Noah
+WITH EmployeeHierarchy AS
+(
+    SELECT EmployeeID, Name, ManagerID
+    FROM Employees
+    WHERE EmployeeID = 4
+
+    UNION ALL
+
+    SELECT e.EmployeeID, e.Name, e.ManagerID
+    FROM Employees AS e
+    JOIN EmployeeHierarchy AS eh
+        ON e.ManagerID = eh.EmployeeID
+)
+SELECT * FROM EmployeeHierarchy;
+
+-- 132. Emma and everyone underneath Emma
+WITH EmployeeHierarchy AS
+(
+    SELECT EmployeeID, Name, ManagerID
+    FROM Employees
+    WHERE EmployeeID = 1
+
+    UNION ALL
+
+    SELECT e.EmployeeID, e.Name, e.ManagerID
+    FROM Employees AS e
+    JOIN EmployeeHierarchy AS eh
+        ON e.ManagerID = eh.EmployeeID
+)
+SELECT * FROM EmployeeHierarchy;
+
+-- 133. Start with Leo and move upward through his managers
+WITH ManagementChain AS
+(
+    SELECT EmployeeID, Name, ManagerID
+    FROM Employees
+    WHERE EmployeeID = 8
+
+    UNION ALL
+
+    SELECT e.EmployeeID, e.Name, e.ManagerID
+    FROM Employees AS e
+    JOIN ManagementChain AS mc
+        ON e.EmployeeID = mc.ManagerID
+)
+SELECT * FROM ManagementChain;
+
+-- 134. Category hierarchy starting from Computers
+WITH CategoryHierarchy AS
+(
+    SELECT CategoryID, CategoryName, ParentCategoryID
+    FROM Categories
+    WHERE CategoryID = 2
+
+    UNION ALL
+
+    SELECT c.CategoryID, c.CategoryName, c.ParentCategoryID
+    FROM Categories AS c
+    JOIN CategoryHierarchy AS ch
+        ON c.ParentCategoryID = ch.CategoryID
+)
+SELECT * FROM CategoryHierarchy;
+
+-- 135. Start with Projects and move upward through folders
+WITH FolderPath AS
+(
+    SELECT FolderID, FolderName, ParentFolderID
+    FROM Folders
+    WHERE FolderID = 6
+
+    UNION ALL
+
+    SELECT f.FolderID, f.FolderName, f.ParentFolderID
+    FROM Folders AS f
+    JOIN FolderPath AS fh
+        ON f.FolderID = fh.ParentFolderID
+)
+SELECT * FROM FolderPath;
