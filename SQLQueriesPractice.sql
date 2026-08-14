@@ -1029,3 +1029,142 @@ SELECT c.FirstName, c.Country, ct.TotalSpending, ct.NumberOfOrders,
 FROM Customers AS c
 JOIN CustomerTotals AS ct ON c.CustomerID = ct.CustomerID
 WHERE ct.TotalSpending >= 500;
+
+
+-- MULTIPLE CTEs
+
+-- 113. Two independent CTEs: customer totals and order counts
+WITH CustomerTotals AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+),
+CustomerOrderCounts AS
+(
+    SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT ct.CustomerID, ct.TotalSpending, cc.NumberOfOrders
+FROM CustomerTotals AS ct
+JOIN CustomerOrderCounts AS cc
+    ON ct.CustomerID = cc.CustomerID
+WHERE ct.TotalSpending > 500;
+
+-- 114. Second CTE uses the first CTE
+WITH CustomerTotals AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+),
+HighSpenders AS
+(
+    SELECT CustomerID, TotalSpending
+    FROM CustomerTotals
+    WHERE TotalSpending > 600
+)
+SELECT *
+FROM HighSpenders;
+
+-- 115. Chained CTEs followed by a join to Customers
+WITH CustomerStats AS
+(
+    SELECT
+        CustomerID,
+        SUM(Amount) AS TotalSpending,
+        COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+),
+ActiveCustomers AS
+(
+    SELECT CustomerID, TotalSpending, NumberOfOrders
+    FROM CustomerStats
+    WHERE TotalSpending >= 500
+      AND NumberOfOrders >= 2
+)
+SELECT
+    c.FirstName,
+    c.Country,
+    ac.TotalSpending,
+    ac.NumberOfOrders
+FROM Customers AS c
+JOIN ActiveCustomers AS ac
+    ON c.CustomerID = ac.CustomerID;
+
+-- 116. Two independent filtered CTEs
+WITH CanadianCustomers AS
+(
+    SELECT CustomerID, FirstName
+    FROM Customers
+    WHERE Country = 'Canada'
+),
+HighValueOrders AS
+(
+    SELECT CustomerID, OrderID, Amount
+    FROM Orders
+    WHERE Amount > 300
+)
+SELECT cc.FirstName, hv.OrderID, hv.Amount
+FROM CanadianCustomers AS cc
+JOIN HighValueOrders AS hv
+    ON cc.CustomerID = hv.CustomerID;
+
+-- 117. Customer totals and averages in separate CTEs
+WITH CustomerTotals AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+),
+CustomerAverages AS
+(
+    SELECT CustomerID, AVG(Amount) AS AverageAmount
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT
+    ct.CustomerID,
+    ct.TotalSpending,
+    ca.AverageAmount
+FROM CustomerTotals AS ct
+JOIN CustomerAverages AS ca
+    ON ct.CustomerID = ca.CustomerID
+WHERE ct.TotalSpending > 600
+  AND ca.AverageAmount > 300;
+
+-- 118. Three CTEs: totals, counts, and qualified customers
+WITH CustomerTotals AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+),
+CustomerOrderCounts AS
+(
+    SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+),
+QualifiedCustomers AS
+(
+    SELECT
+        ct.CustomerID,
+        ct.TotalSpending,
+        cc.NumberOfOrders
+    FROM CustomerTotals AS ct
+    JOIN CustomerOrderCounts AS cc
+        ON ct.CustomerID = cc.CustomerID
+    WHERE ct.TotalSpending >= 500
+      AND cc.NumberOfOrders >= 2
+)
+SELECT
+    c.FirstName,
+    c.Country,
+    q.TotalSpending,
+    q.NumberOfOrders
+FROM Customers AS c
+JOIN QualifiedCustomers AS q
+    ON c.CustomerID = q.CustomerID;
