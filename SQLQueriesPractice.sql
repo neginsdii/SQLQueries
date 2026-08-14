@@ -953,3 +953,79 @@ SELECT *
 FROM CustomerStats
 WHERE TotalSpending > 600
   AND NumberOfOrders >= 2;
+
+-- Question 107 is intentionally not included because it has not been answered yet.
+
+-- 107. Customer totals CTE joined with Customers; return spending over 600
+WITH CustomerTotal AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT c.FirstName, c.Country, ct.TotalSpending
+FROM Customers AS c
+JOIN CustomerTotal AS ct ON c.CustomerID = ct.CustomerID
+WHERE ct.TotalSpending > 600;
+
+-- 108. Customer stats CTE joined with Customers; average amount over 300
+WITH CustomerStats AS
+(
+    SELECT CustomerID, COUNT(OrderID) AS NumberOfOrders, AVG(Amount) AS AverageAmount
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT c.FirstName, c.Country, ct.NumberOfOrders, ct.AverageAmount
+FROM Customers AS c
+JOIN CustomerStats AS ct ON c.CustomerID = ct.CustomerID
+WHERE ct.AverageAmount > 300;
+
+-- 109. Customer total spending and number of orders
+WITH CustomerTotalSpending AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending, COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT c.FirstName, ct.TotalSpending, ct.NumberOfOrders
+FROM Customers AS c
+JOIN CustomerTotalSpending AS ct ON c.CustomerID = ct.CustomerID
+WHERE ct.TotalSpending > 500 AND ct.NumberOfOrders >= 2;
+
+-- 110. High-value orders CTE
+WITH HighValueOrders AS
+(
+    SELECT CustomerID, OrderID, Amount
+    FROM Orders
+    WHERE Amount > 300
+)
+SELECT c.FirstName, hv.OrderID, hv.Amount
+FROM Customers AS c
+JOIN HighValueOrders AS hv ON c.CustomerID = hv.CustomerID;
+
+-- 111. Canadian customers CTE joined to Orders
+WITH CanadianCustomers AS
+(
+    SELECT CustomerID, FirstName
+    FROM Customers
+    WHERE Country = 'Canada'
+)
+SELECT cc.FirstName, o.OrderID, o.Amount
+FROM CanadianCustomers AS cc
+JOIN Orders AS o ON cc.CustomerID = o.CustomerID;
+
+-- 112. Customer totals CTE with CASE classification
+WITH CustomerTotals AS
+(
+    SELECT CustomerID, SUM(Amount) AS TotalSpending, COUNT(OrderID) AS NumberOfOrders
+    FROM Orders
+    GROUP BY CustomerID
+)
+SELECT c.FirstName, c.Country, ct.TotalSpending, ct.NumberOfOrders,
+    CASE
+        WHEN ct.TotalSpending > 700 AND ct.NumberOfOrders >= 3 THEN 'VIP'
+        ELSE 'Regular'
+    END AS CustomerLevel
+FROM Customers AS c
+JOIN CustomerTotals AS ct ON c.CustomerID = ct.CustomerID
+WHERE ct.TotalSpending >= 500;
