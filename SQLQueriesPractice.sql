@@ -1449,50 +1449,37 @@ SELECT OrderID, CustomerID, Amount,
        COUNT(OrderID) OVER (PARTITION BY CustomerID) AS CustomerOrderCount
 FROM Orders;
 
--- 144.
--- Number orders from highest Amount to lowest Amount.
 
+-- ============================================
+-- ROW_NUMBER, RANK, DENSE_RANK
+-- Questions 144–156
+-- ============================================
+
+-- 144. Number orders from highest Amount to lowest Amount
 SELECT
     OrderID,
     CustomerID,
     Amount,
-    ROW_NUMBER() OVER (
-        ORDER BY Amount DESC
-    ) AS RowNum
+    ROW_NUMBER() OVER (ORDER BY Amount DESC) AS RowNum
 FROM Orders;
 
-
--- 145.
--- Number orders from smallest Amount to largest Amount.
-
+-- 145. Number orders from smallest Amount to largest Amount
 SELECT
     OrderID,
     CustomerID,
     Amount,
-    ROW_NUMBER() OVER (
-        ORDER BY Amount ASC
-    ) AS RowNum
+    ROW_NUMBER() OVER (ORDER BY Amount ASC) AS RowNum
 FROM Orders;
 
-
--- 146.
--- Number orders by OrderID from smallest to largest.
-
+-- 146. Number orders by OrderID from smallest to largest
 SELECT
     OrderID,
     CustomerID,
     Amount,
-    ROW_NUMBER() OVER (
-        ORDER BY OrderID ASC
-    ) AS RowNum
+    ROW_NUMBER() OVER (ORDER BY OrderID ASC) AS RowNum
 FROM Orders;
 
-
--- 147.
--- Number by CustomerID from smallest to largest.
--- If CustomerID is the same,
--- order by Amount from highest to lowest.
-
+-- 147. Number by CustomerID ASC, then Amount DESC within matching CustomerIDs
 SELECT
     OrderID,
     CustomerID,
@@ -1502,12 +1489,7 @@ SELECT
     ) AS RowNum
 FROM Orders;
 
-
--- 148.
--- Number by Amount from highest to lowest.
--- If Amount is the same,
--- smaller OrderID comes first.
-
+-- 148. Number by Amount DESC; if tied, smaller OrderID first
 SELECT
     OrderID,
     CustomerID,
@@ -1516,3 +1498,66 @@ SELECT
         ORDER BY Amount DESC, OrderID ASC
     ) AS RowNum
 FROM Orders;
+
+-- 149. Rank orders from highest Amount to lowest Amount
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    RANK() OVER (ORDER BY Amount DESC) AS AmountRank
+FROM Orders;
+
+-- 150. Rank orders from smallest Amount to largest Amount
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    RANK() OVER (ORDER BY Amount ASC) AS AmountRank
+FROM Orders;
+
+-- 151. Rank orders from highest Amount to lowest with ties sharing rank
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    RANK() OVER (ORDER BY Amount DESC) AS AmountRank
+FROM Orders;
+
+-- 152. Rank products by price without skipping rank numbers
+SELECT
+    ProductID,
+    ProductName,
+    Price,
+    DENSE_RANK() OVER (ORDER BY Price DESC) AS PriceRank
+FROM Products;
+
+-- 153. Rank players by score; ties share position and no numbers are skipped
+SELECT
+    Player,
+    Score,
+    DENSE_RANK() OVER (ORDER BY Score DESC) AS Position
+FROM Players;
+
+-- 154. Rank students by grade; ties share rank and positions are skipped after ties
+SELECT
+    Student,
+    Grade,
+    RANK() OVER (ORDER BY Grade DESC) AS Position
+FROM Students;
+
+-- 155. Give every game a unique number based on downloads
+-- Game ASC is included as a deterministic tie-breaker.
+SELECT
+    Game,
+    Downloads,
+    ROW_NUMBER() OVER (
+        ORDER BY Downloads DESC, Game ASC
+    ) AS Number
+FROM Games;
+
+-- 156. Rank employees by salary; ties share position and no positions are skipped
+SELECT
+    Employee,
+    Salary,
+    DENSE_RANK() OVER (ORDER BY Salary DESC) AS Position
+FROM Employees;
