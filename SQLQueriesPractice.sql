@@ -1396,3 +1396,55 @@ WITH FolderPath AS
         ON f.FolderID = fh.ParentFolderID
 )
 SELECT * FROM FolderPath;
+
+-- ============================================
+-- WINDOW FUNCTIONS: Questions 136-143
+-- ============================================
+
+-- 136
+SELECT OrderID, CustomerID, Amount,
+       SUM(Amount) OVER (PARTITION BY CustomerID) AS CustomerTotal
+FROM Orders;
+
+-- 137
+SELECT OrderID, CustomerID, Amount,
+       AVG(Amount) OVER (PARTITION BY CustomerID) AS CustomerAverage
+FROM Orders;
+
+-- 138
+SELECT OrderID, CustomerID, Amount,
+       COUNT(OrderID) OVER (PARTITION BY CustomerID) AS CustomerOrderCount
+FROM Orders;
+
+-- 139
+SELECT OrderID, CustomerID, Amount,
+       MAX(Amount) OVER (PARTITION BY CustomerID) AS CustomerMaxAmount
+FROM Orders;
+
+-- 140
+SELECT OrderID, CustomerID, Amount,
+       MIN(Amount) OVER (PARTITION BY CustomerID) AS CustomerMinAmount
+FROM Orders;
+
+-- 141
+SELECT OrderID, CustomerID, Amount,
+       SUM(Amount) OVER (PARTITION BY CustomerID) AS CustomerTotal,
+       AVG(Amount) OVER (PARTITION BY CustomerID) AS CustomerAverage,
+       COUNT(OrderID) OVER (PARTITION BY CustomerID) AS CustomerOrderCount
+FROM Orders;
+
+-- 142
+SELECT OrderID, CustomerID, Amount,
+       SUM(Amount) OVER (PARTITION BY CustomerID) AS CustomerTotal,
+       MIN(Amount) OVER (PARTITION BY CustomerID) AS CustomerMinAmount,
+       MAX(Amount) OVER (PARTITION BY CustomerID) AS CustomerMaxAmount
+FROM Orders;
+
+-- 143
+SELECT OrderID, CustomerID, Amount,
+       SUM(Amount) OVER (PARTITION BY CustomerID) AS CustomerTotal,
+       AVG(Amount) OVER (PARTITION BY CustomerID) AS CustomerAverage,
+       MIN(Amount) OVER (PARTITION BY CustomerID) AS CustomerMinAmount,
+       MAX(Amount) OVER (PARTITION BY CustomerID) AS CustomerMaxAmount,
+       COUNT(OrderID) OVER (PARTITION BY CustomerID) AS CustomerOrderCount
+FROM Orders;
