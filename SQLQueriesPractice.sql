@@ -1635,3 +1635,75 @@ SELECT
         ORDER BY Grade DESC
     ) AS ClassRank
 FROM Students;
+
+
+-- 162.
+-- Calculate a running total of order amounts
+-- following OrderID from smallest to largest.
+
+SELECT
+    OrderID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY OrderID ASC
+    ) AS RunningTotal
+FROM Orders;
+
+
+-- 163.
+-- Calculate a running total of transactions
+-- following TransactionID from smallest to largest.
+
+SELECT
+    TransactionID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY TransactionID ASC
+    ) AS RunningTotal
+FROM Transactions;
+
+
+-- 164.
+-- Calculate a separate running total for each customer.
+-- Restart the running total when CustomerID changes.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    SUM(Amount) OVER (
+        PARTITION BY CustomerID
+        ORDER BY OrderID ASC
+    ) AS RunningTotal
+FROM Orders;
+
+
+-- 165.
+-- Calculate a separate running total for each store.
+-- Follow SaleID from smallest to largest.
+
+SELECT
+    SaleID,
+    StoreID,
+    Amount,
+    SUM(Amount) OVER (
+        PARTITION BY StoreID
+        ORDER BY SaleID ASC
+    ) AS RunningSales
+FROM Sales;
+
+
+-- 166.
+-- Calculate a separate running total for each account.
+-- Accumulate payments from oldest date to newest date.
+
+SELECT
+    PaymentID,
+    AccountID,
+    PaymentDate,
+    Amount,
+    SUM(Amount) OVER (
+        PARTITION BY AccountID
+        ORDER BY PaymentDate ASC
+    ) AS RunningPayment
+FROM Payments;
