@@ -1448,3 +1448,71 @@ SELECT OrderID, CustomerID, Amount,
        MAX(Amount) OVER (PARTITION BY CustomerID) AS CustomerMaxAmount,
        COUNT(OrderID) OVER (PARTITION BY CustomerID) AS CustomerOrderCount
 FROM Orders;
+
+-- 144.
+-- Number orders from highest Amount to lowest Amount.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        ORDER BY Amount DESC
+    ) AS RowNum
+FROM Orders;
+
+
+-- 145.
+-- Number orders from smallest Amount to largest Amount.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        ORDER BY Amount ASC
+    ) AS RowNum
+FROM Orders;
+
+
+-- 146.
+-- Number orders by OrderID from smallest to largest.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        ORDER BY OrderID ASC
+    ) AS RowNum
+FROM Orders;
+
+
+-- 147.
+-- Number by CustomerID from smallest to largest.
+-- If CustomerID is the same,
+-- order by Amount from highest to lowest.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        ORDER BY CustomerID ASC, Amount DESC
+    ) AS RowNum
+FROM Orders;
+
+
+-- 148.
+-- Number by Amount from highest to lowest.
+-- If Amount is the same,
+-- smaller OrderID comes first.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        ORDER BY Amount DESC, OrderID ASC
+    ) AS RowNum
+FROM Orders;
