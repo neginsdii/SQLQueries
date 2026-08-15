@@ -1561,3 +1561,77 @@ SELECT
     Salary,
     DENSE_RANK() OVER (ORDER BY Salary DESC) AS Position
 FROM Employees;
+
+-- 157.
+-- Rank players by score separately within each team.
+-- Same scores share rank; ranks may be skipped.
+
+SELECT
+    Player,
+    Team,
+    Score,
+    RANK() OVER (
+        PARTITION BY Team
+        ORDER BY Score DESC
+    ) AS TeamRank
+FROM Players;
+
+
+-- 158.
+-- Rank products by price separately within each category.
+-- Same prices share rank; no ranks are skipped.
+
+SELECT
+    ProductName,
+    Category,
+    Price,
+    DENSE_RANK() OVER (
+        PARTITION BY Category
+        ORDER BY Price DESC
+    ) AS PriceRank
+FROM Products;
+
+
+-- 159.
+-- Rank employees by salary separately within each department.
+-- Same salaries share position; next position is skipped.
+
+SELECT
+    Employee,
+    Department,
+    Salary,
+    RANK() OVER (
+        PARTITION BY Department
+        ORDER BY Salary DESC
+    ) AS SalaryPosition
+FROM Employees;
+
+
+-- 160.
+-- Give each order a unique number separately for each customer.
+-- Largest order gets number 1.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    ROW_NUMBER() OVER (
+        PARTITION BY CustomerID
+        ORDER BY Amount DESC
+    ) AS OrderNumber
+FROM Orders;
+
+
+-- 161.
+-- Rank students by grade separately within each class.
+-- Same grades share rank; no ranks are skipped.
+
+SELECT
+    Student,
+    Class,
+    Grade,
+    DENSE_RANK() OVER (
+        PARTITION BY Class
+        ORDER BY Grade DESC
+    ) AS ClassRank
+FROM Students;
