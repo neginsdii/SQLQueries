@@ -1562,148 +1562,86 @@ SELECT
     DENSE_RANK() OVER (ORDER BY Salary DESC) AS Position
 FROM Employees;
 
--- 157.
--- Rank players by score separately within each team.
--- Same scores share rank; ranks may be skipped.
-
-SELECT
-    Player,
-    Team,
-    Score,
-    RANK() OVER (
-        PARTITION BY Team
-        ORDER BY Score DESC
-    ) AS TeamRank
+-- 157.Rank players by score separately within each team
+SELECT Player, Team, Score,
+RANK() OVER (PARTITION BY Team ORDER BY Score DESC) AS TeamRank
 FROM Players;
 
-
--- 158.
--- Rank products by price separately within each category.
--- Same prices share rank; no ranks are skipped.
-
-SELECT
-    ProductName,
-    Category,
-    Price,
-    DENSE_RANK() OVER (
-        PARTITION BY Category
-        ORDER BY Price DESC
-    ) AS PriceRank
+-- 158.Rank products by price separately within each category
+SELECT ProductName, Category, Price,
+DENSE_RANK() OVER (PARTITION BY Category ORDER BY Price DESC) AS PriceRank
 FROM Products;
 
-
--- 159.
--- Rank employees by salary separately within each department.
--- Same salaries share position; next position is skipped.
-
-SELECT
-    Employee,
-    Department,
-    Salary,
-    RANK() OVER (
-        PARTITION BY Department
-        ORDER BY Salary DESC
-    ) AS SalaryPosition
+-- 159.Rank employees by salary separately within each department
+SELECT Employee, Department, Salary,
+RANK() OVER (PARTITION BY Department ORDER BY Salary DESC) AS SalaryPosition
 FROM Employees;
 
-
--- 160.
--- Give each order a unique number separately for each customer.
--- Largest order gets number 1.
-
-SELECT
-    OrderID,
-    CustomerID,
-    Amount,
-    ROW_NUMBER() OVER (
-        PARTITION BY CustomerID
-        ORDER BY Amount DESC
-    ) AS OrderNumber
+-- 160.Give each order a unique number separately for each customer
+SELECT OrderID, CustomerID, Amount,
+ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY Amount DESC) AS OrderNumber
 FROM Orders;
 
-
--- 161.
--- Rank students by grade separately within each class.
--- Same grades share rank; no ranks are skipped.
-
-SELECT
-    Student,
-    Class,
-    Grade,
-    DENSE_RANK() OVER (
-        PARTITION BY Class
-        ORDER BY Grade DESC
-    ) AS ClassRank
+-- 161.Rank students by grade separately within each class
+SELECT Student, Class, Grade,
+DENSE_RANK() OVER (PARTITION BY Class ORDER BY Grade DESC) AS ClassRank
 FROM Students;
 
-
--- 162.
--- Calculate a running total of order amounts
--- following OrderID from smallest to largest.
-
-SELECT
-    OrderID,
-    Amount,
-    SUM(Amount) OVER (
-        ORDER BY OrderID ASC
-    ) AS RunningTotal
+-- 162.Running total by OrderID
+SELECT OrderID, Amount,
+SUM(Amount) OVER (ORDER BY OrderID ASC) AS RunningTotal
 FROM Orders;
 
-
--- 163.
--- Calculate a running total of transactions
--- following TransactionID from smallest to largest.
-
-SELECT
-    TransactionID,
-    Amount,
-    SUM(Amount) OVER (
-        ORDER BY TransactionID ASC
-    ) AS RunningTotal
+-- 163.Running total by TransactionID
+SELECT TransactionID, Amount,
+SUM(Amount) OVER (ORDER BY TransactionID ASC) AS RunningTotal
 FROM Transactions;
 
-
--- 164.
--- Calculate a separate running total for each customer.
--- Restart the running total when CustomerID changes.
-
-SELECT
-    OrderID,
-    CustomerID,
-    Amount,
-    SUM(Amount) OVER (
-        PARTITION BY CustomerID
-        ORDER BY OrderID ASC
-    ) AS RunningTotal
+-- 164.Separate running total for each customer
+SELECT OrderID, CustomerID, Amount,
+SUM(Amount) OVER (PARTITION BY CustomerID ORDER BY OrderID ASC) AS RunningTotal
 FROM Orders;
 
-
--- 165.
--- Calculate a separate running total for each store.
--- Follow SaleID from smallest to largest.
-
-SELECT
-    SaleID,
-    StoreID,
-    Amount,
-    SUM(Amount) OVER (
-        PARTITION BY StoreID
-        ORDER BY SaleID ASC
-    ) AS RunningSales
+-- 165.Separate running total for each store
+SELECT SaleID, StoreID, Amount,
+SUM(Amount) OVER (PARTITION BY StoreID ORDER BY SaleID ASC) AS RunningSales
 FROM Sales;
 
-
--- 166.
--- Calculate a separate running total for each account.
--- Accumulate payments from oldest date to newest date.
-
-SELECT
-    PaymentID,
-    AccountID,
-    PaymentDate,
-    Amount,
-    SUM(Amount) OVER (
-        PARTITION BY AccountID
-        ORDER BY PaymentDate ASC
-    ) AS RunningPayment
+-- 166.Separate running total for each account by payment date
+SELECT PaymentID, AccountID, PaymentDate, Amount,
+SUM(Amount) OVER (PARTITION BY AccountID ORDER BY PaymentDate ASC) AS RunningPayment
 FROM Payments;
+
+-- 167.3-row moving average: current sale + previous 2 sales
+SELECT SaleID, Amount,
+AVG(Amount) OVER (
+    ORDER BY SaleID
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+) AS MovingAverage
+FROM Sales;
+
+-- 168.5-row moving average: current day + previous 4 days
+SELECT DayID, Price,
+AVG(Price) OVER (
+    ORDER BY DayID ASC
+    ROWS BETWEEN 4 PRECEDING AND CURRENT ROW
+) AS MovingAverage
+FROM StockPrices;
+
+-- 169.Separate 3-sale moving average for each store
+SELECT SaleID, StoreID, Amount,
+AVG(Amount) OVER (
+    PARTITION BY StoreID
+    ORDER BY SaleID ASC
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+) AS MovingAverage
+FROM Sales;
+
+-- 170.Separate 4-measurement moving average for each sensor
+SELECT MeasurementID, SensorID, Temperature,
+AVG(Temperature) OVER (
+    PARTITION BY SensorID
+    ORDER BY MeasurementID ASC
+    ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
+) AS MovingAverage
+FROM Measurements;
