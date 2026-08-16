@@ -1645,3 +1645,85 @@ AVG(Temperature) OVER (
     ROWS BETWEEN 3 PRECEDING AND CURRENT ROW
 ) AS MovingAverage
 FROM Measurements;
+
+-- ============================================
+-- LAG()
+-- Questions 171–174
+-- ============================================
+
+
+-- 171.
+-- Show the previous day's temperature.
+
+SELECT
+    DayID,
+    Temperature,
+    LAG(Temperature) OVER (
+        ORDER BY DayID
+    ) AS PreviousTemperature
+FROM Temperatures;
+
+
+-- 172.
+-- Show the price from 2 rows/days earlier.
+
+SELECT
+    DayID,
+    Price,
+    LAG(Price, 2) OVER (
+        ORDER BY DayID
+    ) AS PriceTwoDaysAgo
+FROM StockPrices;
+
+
+-- 173.
+-- Show the previous month's sales
+-- and calculate the difference between
+-- current sales and previous sales.
+
+SELECT
+    MonthID,
+    SalesAmount,
+    LAG(SalesAmount) OVER (
+        ORDER BY MonthID
+    ) AS PreviousSales,
+    SalesAmount - LAG(SalesAmount) OVER (
+        ORDER BY MonthID
+    ) AS SalesDifference
+FROM Sales;
+
+
+-- 173. Alternative solution using a CTE
+
+WITH SalesWithPrevious AS
+(
+    SELECT
+        MonthID,
+        SalesAmount,
+        LAG(SalesAmount) OVER (
+            ORDER BY MonthID
+        ) AS PreviousSales
+    FROM Sales
+)
+
+SELECT
+    MonthID,
+    SalesAmount,
+    PreviousSales,
+    SalesAmount - PreviousSales AS SalesDifference
+FROM SalesWithPrevious;
+
+
+-- 174.
+-- Show the previous employee's salary
+-- separately within each department.
+
+SELECT
+    EmployeeID,
+    Department,
+    Salary,
+    LAG(Salary) OVER (
+        PARTITION BY Department
+        ORDER BY EmployeeID
+    ) AS PreviousSalary
+FROM Employees;
