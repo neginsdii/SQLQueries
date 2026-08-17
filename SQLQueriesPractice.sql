@@ -1923,3 +1923,188 @@ SELECT
         ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING
     ) AS WindowAverage
 FROM Sales;
+
+-- 185.
+-- Show each customer's total spending
+-- and rank their orders from highest to lowest amount.
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+
+    SUM(Amount) OVER (
+        PARTITION BY CustomerID
+    ) AS CustomerTotal,
+
+    DENSE_RANK() OVER (
+        PARTITION BY CustomerID
+        ORDER BY Amount DESC
+    ) AS OrderRank
+
+FROM Orders;
+
+
+-- 186.
+-- Show the average salary for each department
+-- and rank salaries within each department.
+-- Equal salaries share rank and no ranks are skipped.
+
+SELECT
+    EmployeeID,
+    Department,
+    Salary,
+
+    AVG(Salary) OVER (
+        PARTITION BY Department
+    ) AS DepartmentAverage,
+
+    DENSE_RANK() OVER (
+        PARTITION BY Department
+        ORDER BY Salary DESC
+    ) AS SalaryRank
+
+FROM Employees;
+
+
+-- 187.
+-- Show the previous order amount for each customer
+-- and calculate the difference from the previous order.
+
+WITH PreviousAmounts AS
+(
+    SELECT
+        OrderID,
+        CustomerID,
+        Amount,
+
+        LAG(Amount) OVER (
+            PARTITION BY CustomerID
+            ORDER BY OrderID
+        ) AS PreviousAmount
+
+    FROM Orders
+)
+
+SELECT
+    OrderID,
+    CustomerID,
+    Amount,
+    PreviousAmount,
+    Amount - PreviousAmount AS AmountDifference
+FROM PreviousAmounts;
+
+
+-- 188.
+-- Calculate a running total and a 3-sale moving average
+-- separately for each store.
+
+SELECT
+    SaleID,
+    StoreID,
+    Amount,
+
+    SUM(Amount) OVER (
+        PARTITION BY StoreID
+        ORDER BY SaleID
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS RunningTotal,
+
+    AVG(Amount) OVER (
+        PARTITION BY StoreID
+        ORDER BY SaleID
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS MovingAverage
+
+FROM Sales
+ORDER BY StoreID, SaleID;
+
+
+-- 189.
+-- Calculate a running total for each account,
+-- show the previous transaction amount,
+-- and calculate the change from the previous transaction.
+
+SELECT
+    TransactionID,
+    AccountID,
+    Amount,
+
+    SUM(Amount) OVER (
+        PARTITION BY AccountID
+        ORDER BY TransactionID
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS RunningTotal,
+
+    LAG(Amount) OVER (
+        PARTITION BY AccountID
+        ORDER BY TransactionID
+    ) AS PreviousAmount,
+
+    Amount - LAG(Amount) OVER (
+        PARTITION BY AccountID
+        ORDER BY TransactionID
+    ) AS AmountChange
+
+FROM Transactions
+ORDER BY AccountID, TransactionID;
+
+
+-- 190.
+-- Show the category average,
+-- price rank within each category,
+-- and previous product price.
+
+SELECT
+    ProductID,
+    Category,
+    Price,
+
+    AVG(Price) OVER (
+        PARTITION BY Category
+    ) AS CategoryAverage,
+
+    DENSE_RANK() OVER (
+        PARTITION BY Category
+        ORDER BY Price DESC
+    ) AS PriceRank,
+
+    LAG(Price) OVER (
+        PARTITION BY Category
+        ORDER BY ProductID
+    ) AS PreviousPrice
+
+FROM Products;
+
+
+-- 191.
+-- Show department salary total,
+-- salary rank,
+-- previous salary,
+-- and salary difference.
+
+SELECT
+    EmployeeID,
+    Department,
+    Salary,
+
+    SUM(Salary) OVER (
+        PARTITION BY Department
+    ) AS DepartmentTotal,
+
+    RANK() OVER (
+        PARTITION BY Department
+        ORDER BY Salary DESC
+    ) AS SalaryRank,
+
+    LAG(Salary) OVER (
+        PARTITION BY Department
+        ORDER BY EmployeeID
+    ) AS PreviousSalary,
+
+    Salary - LAG(Salary) OVER (
+        PARTITION BY Department
+        ORDER BY EmployeeID
+    ) AS SalaryDifference
+
+FROM Employees;
