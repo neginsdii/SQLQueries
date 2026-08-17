@@ -2995,3 +2995,96 @@ GROUP BY CustomerID;
 -- The underlying tables and data remain.
 
 DROP VIEW OldCustomerReport;
+
+-- =========================================================
+-- 259. CREATE A TEMPORARY TABLE
+-- =========================================================
+
+CREATE TABLE #TempProducts
+(
+    ProductID INT,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+
+
+-- =========================================================
+-- 260. INSERT INTO A TEMPORARY TABLE
+-- =========================================================
+
+INSERT INTO #TempProducts
+    (ProductID, ProductName, Price)
+VALUES
+    (1, 'Laptop', 1200.00),
+    (2, 'Mouse', 25.50);
+
+
+-- =========================================================
+-- 261. QUERY A TEMPORARY TABLE
+-- =========================================================
+
+SELECT *
+FROM #TempProducts;
+
+
+-- =========================================================
+-- 262. SELECT INTO
+-- Create + populate a temp table in one query
+-- =========================================================
+
+SELECT
+    EmployeeID,
+    EmployeeName,
+    Salary
+INTO #ITEmployees
+FROM Employees
+WHERE Department = 'IT';
+
+
+-- =========================================================
+-- 263. SELECT INTO + GROUP BY
+-- Create a temp table containing customer totals
+-- =========================================================
+
+SELECT
+    CustomerID,
+    SUM(Amount) AS TotalSpent
+INTO #CustomerTotals
+FROM Orders
+GROUP BY CustomerID;
+
+
+-- =========================================================
+-- 264. FILTER DATA FROM A TEMP TABLE
+-- =========================================================
+
+SELECT *
+FROM #CustomerTotals
+WHERE TotalSpent > 1000;
+
+
+-- =========================================================
+-- 265. UPDATE A TEMPORARY TABLE
+-- Increase prices below 100 by 10%
+-- =========================================================
+
+UPDATE #TempProducts
+SET Price = Price * 1.1
+WHERE Price < 100;
+
+
+-- Your CASE solution also works:
+
+UPDATE #TempProducts
+SET Price =
+    CASE
+        WHEN Price < 100 THEN Price * 1.1
+        ELSE Price
+    END;
+
+
+-- =========================================================
+-- 266. DROP A TEMPORARY TABLE
+-- =========================================================
+
+DROP TABLE #TempProducts;
