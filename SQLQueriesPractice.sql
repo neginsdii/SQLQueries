@@ -2150,3 +2150,171 @@ INSERT INTO Customers
     (FirstName, LastName, Country, City)
 VALUES
     ('Daniel', 'Clark', 'Canada', NULL);
+
+-- ============================================
+-- INSERT
+-- Questions 196–200
+-- ============================================
+
+
+-- 196.
+-- Insert Olivia without including City.
+-- City becomes NULL automatically.
+
+INSERT INTO Customers (FirstName, LastName, Country)
+VALUES ('Olivia', 'Martin', 'Canada');
+
+
+-- 197.
+-- Insert Sarah into Employees.
+-- EmployeeID is automatically generated.
+-- Phone is not provided and becomes NULL.
+
+INSERT INTO Employees (FirstName, LastName, Department)
+VALUES ('Sarah', 'Johnson', 'IT');
+
+
+-- 198.
+-- Insert Michael.
+-- EmployeeID is automatically generated.
+-- Status uses its DEFAULT value of 'Active'.
+
+INSERT INTO Employees (FirstName, LastName, Department)
+VALUES ('Michael', 'Brown', 'Sales');
+
+
+-- 199.
+-- Copy all IT employees into ITEmployees.
+
+INSERT INTO ITEmployees (FirstName, LastName, Department)
+SELECT
+    FirstName,
+    LastName,
+    Department
+FROM Employees
+WHERE Department = 'IT';
+
+
+-- 200.
+-- Copy products with a price greater than 500
+-- into ExpensiveProducts.
+
+INSERT INTO ExpensiveProducts (ProductName, Category, Price)
+SELECT
+    ProductName,
+    Category,
+    Price
+FROM Products
+WHERE Price > 500;
+
+
+-- ============================================
+-- UPDATE
+-- Questions 201–210
+-- ============================================
+
+
+-- 201.
+-- Update one customer's city.
+
+UPDATE Customers
+SET City = 'Calgary'
+WHERE CustomerID = 3;
+
+
+-- 202.
+-- Update multiple columns for one employee.
+
+UPDATE Employees
+SET
+    Department = 'Marketing',
+    Salary = 72000
+WHERE EmployeeID = 2;
+
+
+-- 203.
+-- Change USA to United States for all matching customers.
+
+UPDATE Customers
+SET Country = 'United States'
+WHERE Country = 'USA';
+
+
+-- 204.
+-- Give all IT employees a $5,000 raise.
+
+UPDATE Employees
+SET Salary = Salary + 5000
+WHERE Department = 'IT';
+
+
+-- 205.
+-- Increase Electronics prices by 10%.
+
+UPDATE Products
+SET Price = Price * 1.10
+WHERE Category = 'Electronics';
+
+
+-- 206.
+-- Give IT employees earning less than $70,000
+-- a $3,000 raise.
+
+UPDATE Employees
+SET Salary = Salary + 3000
+WHERE Department = 'IT'
+  AND Salary < 70000;
+
+
+-- 207.
+-- Replace NULL City values with Unknown.
+
+UPDATE Customers
+SET City = 'Unknown'
+WHERE City IS NULL;
+
+
+-- 208.
+-- Electronics: +10%
+-- Furniture: +5%
+-- Everything else: unchanged.
+
+UPDATE Products
+SET Price =
+    CASE
+        WHEN Category = 'Electronics' THEN Price * 1.10
+        WHEN Category = 'Furniture' THEN Price * 1.05
+        ELSE Price
+    END;
+
+
+-- 209.
+-- IT: +8%
+-- Sales: +5%
+-- HR: +3%
+-- Everything else: unchanged.
+
+UPDATE Employees
+SET Salary =
+    CASE
+        WHEN Department = 'IT' THEN Salary * 1.08
+        WHEN Department = 'Sales' THEN Salary * 1.05
+        WHEN Department = 'HR' THEN Salary * 1.03
+        ELSE Salary
+    END;
+
+
+-- 210.
+-- Apply price increases to Active products only.
+-- Electronics: +10%
+-- Furniture: +5%
+-- Other categories: unchanged.
+
+UPDATE Products
+SET Price =
+    CASE
+        WHEN Category = 'Electronics' THEN Price * 1.10
+        WHEN Category = 'Furniture' THEN Price * 1.05
+        ELSE Price
+    END
+WHERE Status = 'Active';
