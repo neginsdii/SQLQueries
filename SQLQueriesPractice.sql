@@ -3183,3 +3183,169 @@ SELECT *
 FROM Employees
 WHERE Department = @Department
   AND Salary > @DepartmentAverage;
+
+
+-- Question 274
+-- Create a procedure that returns all employees
+
+CREATE PROCEDURE GetAllEmployees
+AS
+BEGIN
+    SELECT *
+    FROM Employees;
+END;
+GO
+
+EXEC GetAllEmployees;
+
+
+-- Question 275
+-- Return all customers from Canada
+
+CREATE PROCEDURE GetCanadianCustomers
+AS
+BEGIN
+    SELECT *
+    FROM Customers
+    WHERE Country = 'Canada';
+END;
+GO
+
+EXEC GetCanadianCustomers;
+
+
+-- Question 276
+-- Return employees with salary greater than 70000
+-- ordered from highest salary to lowest
+
+CREATE PROCEDURE GetHighSalaryEmployees
+AS
+BEGIN
+    SELECT *
+    FROM Employees
+    WHERE Salary > 70000
+    ORDER BY Salary DESC;
+END;
+GO
+
+EXEC GetHighSalaryEmployees;
+
+
+-- Question 277
+-- Accept a country parameter and return customers from that country
+
+CREATE PROCEDURE GetCustomersByCountry
+    @Country VARCHAR(50)
+AS
+BEGIN
+    SELECT *
+    FROM Customers
+    WHERE Country = @Country;
+END;
+GO
+
+EXEC GetCustomersByCountry 'Canada';
+
+
+-- Question 278
+-- Accept a minimum amount and return orders above that amount
+
+CREATE PROCEDURE GetOrdersAboveAmount
+    @MinAmount INT
+AS
+BEGIN
+    SELECT *
+    FROM Orders
+    WHERE Amount > @MinAmount;
+END;
+GO
+
+EXEC GetOrdersAboveAmount 300;
+
+
+-- Question 279
+-- Accept a department and return employees from that department
+
+CREATE PROCEDURE GetEmployeesByDepartment
+    @Department VARCHAR(100)
+AS
+BEGIN
+    SELECT *
+    FROM Employees
+    WHERE Department = @Department;
+END;
+GO
+
+EXEC GetEmployeesByDepartment 'IT';
+
+
+-- Question 280
+-- Accept a CustomerID and return all orders for that customer
+
+CREATE PROCEDURE GetOrdersByCustomer
+    @CustomerID INT
+AS
+BEGIN
+    SELECT *
+    FROM Orders
+    WHERE CustomerID = @CustomerID;
+END;
+GO
+
+EXEC GetOrdersByCustomer 3;
+
+
+-- Question 281
+-- Accept country and city parameters
+-- and return customers matching both
+
+CREATE PROCEDURE GetCustomersByCountryAndCity
+    @Country VARCHAR(50),
+    @City VARCHAR(50)
+AS
+BEGIN
+    SELECT *
+    FROM Customers
+    WHERE Country = @Country
+      AND City = @City;
+END;
+GO
+
+EXEC GetCustomersByCountryAndCity 'Canada', 'Toronto';
+
+
+-- Question 282
+-- Accept minimum and maximum amounts
+-- and return orders between them
+
+CREATE PROCEDURE GetOrdersBetweenAmounts
+    @MinAmount INT,
+    @MaxAmount INT
+AS
+BEGIN
+    SELECT *
+    FROM Orders
+    WHERE Amount BETWEEN @MinAmount AND @MaxAmount;
+END;
+GO
+
+EXEC GetOrdersBetweenAmounts 200, 500;
+
+
+-- Question 283
+-- Accept department and minimum salary
+-- Return employees in that department earning above the minimum
+
+CREATE PROCEDURE GetEmployeesByDeptAndSalary
+    @Department VARCHAR(50),
+    @MinSalary INT
+AS
+BEGIN
+    SELECT *
+    FROM Employees
+    WHERE Department = @Department
+      AND Salary > @MinSalary;
+END;
+GO
+
+EXEC GetEmployeesByDeptAndSalary 'IT', 70000;
