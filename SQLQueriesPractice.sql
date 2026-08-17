@@ -1854,3 +1854,72 @@ FROM
         ) AS NextPrice
     FROM StockPrices
 ) AS PriceData;
+
+-- 180.
+-- Calculate the total of:
+-- previous row + current row + next row.
+
+SELECT
+    DayID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY DayID ASC
+        ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+    ) AS ThreeDayTotal
+FROM Sales;
+
+
+-- 181.
+-- Calculate the total of:
+-- current row + next 2 rows.
+
+SELECT
+    DayID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY DayID ASC
+        ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING
+    ) AS FutureTotal
+FROM Sales;
+
+
+-- 182.
+-- Calculate the total from the current row
+-- through every remaining row.
+
+SELECT
+    DayID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY DayID ASC
+        ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
+    ) AS RemainingTotal
+FROM Sales;
+
+
+-- 183.
+-- Calculate a running total using
+-- an explicit window frame.
+
+SELECT
+    DayID,
+    Amount,
+    SUM(Amount) OVER (
+        ORDER BY DayID ASC
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS RunningTotal
+FROM Sales;
+
+
+-- 184.
+-- Calculate the average of:
+-- previous 2 rows + current row + next 2 rows.
+
+SELECT
+    DayID,
+    Amount,
+    AVG(Amount) OVER (
+        ORDER BY DayID ASC
+        ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING
+    ) AS WindowAverage
+FROM Sales;
