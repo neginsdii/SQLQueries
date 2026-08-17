@@ -2318,3 +2318,84 @@ SET Price =
         ELSE Price
     END
 WHERE Status = 'Active';
+
+
+-- ============================================
+-- DELETE
+-- Questions 211–220
+-- ============================================
+
+
+-- 211.
+-- Delete Michael using his CustomerID.
+
+DELETE FROM Customers
+WHERE CustomerID = 2;
+
+
+-- 212.
+-- Delete all discontinued products.
+
+DELETE FROM Products
+WHERE Status = 'Discontinued';
+
+
+-- 213.
+-- Delete Sales employees earning less than $50,000.
+
+DELETE FROM Employees
+WHERE Department = 'Sales'
+  AND Salary < 50000;
+
+
+-- 214.
+-- Delete customers whose Email is NULL.
+
+DELETE FROM Customers
+WHERE Email IS NULL;
+
+
+-- 215.
+-- Delete products in the Toys or Games categories.
+
+DELETE FROM Products
+WHERE Category IN ('Toys', 'Games');
+
+
+-- 216.
+-- Delete orders made before January 1, 2024.
+
+DELETE FROM Orders
+WHERE OrderDate < '2024-01-01';
+
+
+-- 217.
+-- Delete events that happened before June 1, 2025.
+
+DELETE FROM Events
+WHERE EventDate < '2025-06-01';
+
+
+-- 218.
+-- Delete orders made on or before December 31, 2023.
+
+DELETE FROM Orders
+WHERE OrderDate <= '2023-12-31';
+
+
+-- 219.
+-- Delete orders between January 1, 2024
+-- and June 30, 2024.
+-- BETWEEN includes both boundary dates.
+
+DELETE FROM Orders
+WHERE OrderDate BETWEEN '2024-01-01' AND '2024-06-30';
+
+
+-- 220.
+-- Delete inactive employees who work
+-- in either Sales or HR.
+
+DELETE FROM Employees
+WHERE Status = 'Inactive'
+  AND Department IN ('Sales', 'HR');
