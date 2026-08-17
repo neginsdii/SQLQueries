@@ -2108,3 +2108,45 @@ SELECT
     ) AS SalaryDifference
 
 FROM Employees;
+
+
+
+-- 192.
+-- Insert one customer.
+-- CustomerID is NOT automatically generated.
+
+INSERT INTO Customers
+    (CustomerID, FirstName, LastName, Country, City)
+VALUES
+    (6, 'Anna', 'Green', 'Canada', 'Montreal');
+
+
+-- 193.
+-- Insert one customer.
+-- CustomerID is an IDENTITY column and is generated automatically.
+
+INSERT INTO Customers
+    (FirstName, LastName, Country, City)
+VALUES
+    ('Michael', 'Brown', 'USA', 'Chicago');
+
+
+-- 194.
+-- Insert multiple customers using one INSERT statement.
+-- CustomerID is generated automatically.
+
+INSERT INTO Customers
+    (FirstName, LastName, Country, City)
+VALUES
+    ('Sophia', 'Miller', 'Canada', 'Toronto'),
+    ('James', 'Wilson', 'USA', 'Seattle'),
+    ('Emma', 'Davis', 'Canada', 'Vancouver');
+
+
+-- 195.
+-- Insert a customer with a NULL City.
+
+INSERT INTO Customers
+    (FirstName, LastName, Country, City)
+VALUES
+    ('Daniel', 'Clark', 'Canada', NULL);
