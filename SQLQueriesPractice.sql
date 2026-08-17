@@ -2882,3 +2882,116 @@ CREATE TABLE Employees
     CONSTRAINT CK_Employees_Status
         CHECK (Status IN ('Active', 'Inactive'))
 );
+
+-- =========================================================
+-- 251. CREATE A BASIC VIEW
+-- =========================================================
+-- Create a view containing only IT employees.
+
+CREATE VIEW ITEmployees
+AS
+SELECT
+    EmployeeID,
+    EmployeeName,
+    Department,
+    Salary
+FROM Employees
+WHERE Department = 'IT';
+
+
+-- =========================================================
+-- 252. QUERY A VIEW
+-- =========================================================
+-- Query all columns and rows from the view.
+
+SELECT *
+FROM ITEmployees;
+
+
+-- =========================================================
+-- 253. VIEW WITH SELECTED COLUMNS
+-- =========================================================
+-- Create a view that exposes only contact information.
+
+CREATE VIEW CustomerContacts
+AS
+SELECT
+    CustomerID,
+    FirstName,
+    LastName,
+    Email
+FROM Customers;
+
+
+-- =========================================================
+-- 254. VIEW WITH INNER JOIN
+-- =========================================================
+-- Combine Customers and Orders in a view.
+
+CREATE VIEW CustomerOrders
+AS
+SELECT
+    o.OrderID,
+    c.CustomerName,
+    o.Amount
+FROM Customers AS c
+INNER JOIN Orders AS o
+    ON c.CustomerID = o.CustomerID;
+
+
+-- =========================================================
+-- 255. VIEW WITH JOIN + WHERE
+-- =========================================================
+-- Show employees earning more than 70000
+-- together with their department name.
+
+CREATE VIEW HighSalaryEmployees
+AS
+SELECT
+    e.EmployeeID,
+    e.EmployeeName,
+    d.DepartmentName,
+    e.Salary
+FROM Employees AS e
+INNER JOIN Departments AS d
+    ON e.DepartmentID = d.DepartmentID
+WHERE e.Salary > 70000;
+
+
+-- =========================================================
+-- 256. VIEW WITH GROUP BY
+-- =========================================================
+-- Calculate total spending for each customer.
+
+CREATE VIEW CustomerSpending
+AS
+SELECT
+    CustomerID,
+    SUM(Amount) AS TotalSpent
+FROM Orders
+GROUP BY CustomerID;
+
+
+-- =========================================================
+-- 257. ALTER AN EXISTING VIEW
+-- =========================================================
+-- Modify CustomerSpending to also show
+-- the number of orders for each customer.
+
+ALTER VIEW CustomerSpending
+AS
+SELECT
+    CustomerID,
+    SUM(Amount) AS TotalSpent,
+    COUNT(OrderID) AS OrderCount
+FROM Orders
+GROUP BY CustomerID;
+
+
+-- =========================================================
+-- 258. DROP A VIEW
+-- =========================================================
+-- Remove the view.
+-- The underlying tables and data remain.
+
+DROP VIEW OldCustomerReport;
