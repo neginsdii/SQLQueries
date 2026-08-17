@@ -1727,3 +1727,130 @@ SELECT
         ORDER BY EmployeeID
     ) AS PreviousSalary
 FROM Employees;
+
+-- 175.
+-- Show the next day's temperature.
+
+SELECT
+    DayID,
+    Temperature,
+    LEAD(Temperature) OVER (
+        ORDER BY DayID ASC
+    ) AS NextTemperature
+FROM Temperatures;
+
+
+-- 176.
+-- Show the price 2 rows/days ahead.
+
+SELECT
+    DayID,
+    Price,
+    LEAD(Price, 2) OVER (
+        ORDER BY DayID ASC
+    ) AS PriceTwoDaysLater
+FROM StockPrices;
+
+
+-- 177.
+-- Show the next employee's salary
+-- separately within each department.
+
+SELECT
+    EmployeeID,
+    Department,
+    Salary,
+    LEAD(Salary) OVER (
+        PARTITION BY Department
+        ORDER BY EmployeeID
+    ) AS NextSalary
+FROM Employees;
+
+
+-- 178.
+-- Show next month's sales and calculate
+-- the difference between next month's sales
+-- and current month's sales.
+
+WITH NextSalesTable AS
+(
+    SELECT
+        MonthID,
+        SalesAmount,
+        LEAD(SalesAmount) OVER (
+            ORDER BY MonthID
+        ) AS NextSales
+    FROM Sales
+)
+
+SELECT
+    MonthID,
+    SalesAmount,
+    NextSales,
+    NextSales - SalesAmount AS SalesDifference
+FROM NextSalesTable;
+
+
+-- 179.
+-- Show next day's stock price and calculate
+-- the difference between next price and current price.
+
+WITH NextPriceTable AS
+(
+    SELECT
+        DayID,
+        Price,
+        LEAD(Price) OVER (
+            ORDER BY DayID ASC
+        ) AS NextPrice
+    FROM StockPrices
+)
+
+SELECT
+    DayID,
+    Price,
+    NextPrice,
+    NextPrice - Price AS PriceDifference
+FROM NextPriceTable;
+
+
+-- ============================================
+-- QUESTION 179: ALTERNATIVE SOLUTION 1
+-- Repeat LEAD() directly
+-- ============================================
+
+SELECT
+    DayID,
+    Price,
+
+    LEAD(Price) OVER (
+        ORDER BY DayID
+    ) AS NextPrice,
+
+    LEAD(Price) OVER (
+        ORDER BY DayID
+    ) - Price AS PriceDifference
+
+FROM StockPrices;
+
+
+-- ============================================
+-- QUESTION 179: ALTERNATIVE SOLUTION 2
+-- Derived Table
+-- ============================================
+
+SELECT
+    DayID,
+    Price,
+    NextPrice,
+    NextPrice - Price AS PriceDifference
+FROM
+(
+    SELECT
+        DayID,
+        Price,
+        LEAD(Price) OVER (
+            ORDER BY DayID
+        ) AS NextPrice
+    FROM StockPrices
+) AS PriceData;
