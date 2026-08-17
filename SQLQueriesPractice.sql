@@ -3088,3 +3088,98 @@ SET Price =
 -- =========================================================
 
 DROP TABLE #TempProducts;
+
+-- =========================================================
+-- 267. DECLARE + SET
+-- =========================================================
+-- Create an INT variable and assign its value separately.
+
+DECLARE @MaxPrice INT;
+
+SET @MaxPrice = 500;
+
+
+-- =========================================================
+-- 268. DECLARE + ASSIGN IN ONE STATEMENT
+-- =========================================================
+
+DECLARE @Department VARCHAR(50) = 'IT';
+
+
+-- =========================================================
+-- 269. USE A VARIABLE IN WHERE
+-- =========================================================
+-- Return employees earning more than 70000.
+
+DECLARE @MinSalary INT = 70000;
+
+SELECT *
+FROM Employees
+WHERE Salary > @MinSalary;
+
+
+-- =========================================================
+-- 270. MULTIPLE VARIABLES
+-- =========================================================
+-- Find IT employees earning more than 60000.
+
+DECLARE @MinSalary INT = 60000;
+DECLARE @Department VARCHAR(50) = 'IT';
+
+SELECT *
+FROM Employees
+WHERE Salary > @MinSalary
+  AND Department = @Department;
+
+
+-- =========================================================
+-- 271. STORE QUERY RESULT IN A VARIABLE
+-- =========================================================
+-- Calculate the average product price and print it.
+
+DECLARE @AveragePrice DECIMAL(10,2);
+
+SELECT @AveragePrice = AVG(Price)
+FROM Products;
+
+PRINT @AveragePrice;
+
+
+-- This is also valid:
+
+PRINT(@AveragePrice);
+
+
+-- =========================================================
+-- 272. USE A CALCULATED VARIABLE
+-- =========================================================
+-- Calculate the average product price.
+-- Then return products priced above the average.
+
+DECLARE @AveragePrice DECIMAL(10,2);
+
+SELECT @AveragePrice = AVG(Price)
+FROM Products;
+
+SELECT *
+FROM Products
+WHERE Price > @AveragePrice;
+
+
+-- =========================================================
+-- 273. MULTI-STEP VARIABLE LOGIC
+-- =========================================================
+-- Calculate the average salary for IT.
+-- Then return IT employees earning above that average.
+
+DECLARE @Department VARCHAR(50) = 'IT';
+DECLARE @DepartmentAverage DECIMAL(10,2);
+
+SELECT @DepartmentAverage = AVG(Salary)
+FROM Employees
+WHERE Department = @Department;
+
+SELECT *
+FROM Employees
+WHERE Department = @Department
+  AND Salary > @DepartmentAverage;
