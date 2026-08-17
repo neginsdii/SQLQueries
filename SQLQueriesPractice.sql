@@ -2399,3 +2399,486 @@ WHERE OrderDate BETWEEN '2024-01-01' AND '2024-06-30';
 DELETE FROM Employees
 WHERE Status = 'Inactive'
   AND Department IN ('Sales', 'HR');
+
+-- =========================================================
+-- CREATE TABLE + DATA TYPES
+-- =========================================================
+
+-- 221.
+-- Create a basic Books table.
+
+CREATE TABLE Books
+(
+    BookID INT,
+    Title VARCHAR(100),
+    Author VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+
+
+-- 222.
+-- Create Students using several common data types.
+
+CREATE TABLE Students
+(
+    StudentID INT,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    BirthDate DATE,
+    GPA DECIMAL(3,2),
+    IsActive BIT
+);
+
+
+-- 223.
+-- Create Orders with numeric, date, decimal, and BIT columns.
+
+CREATE TABLE Orders
+(
+    OrderID INT,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10,2),
+    IsPaid BIT
+);
+
+
+-- 224.
+-- Use DATETIME2 for a value containing date + time.
+
+CREATE TABLE Messages
+(
+    MessageID INT,
+    SenderName VARCHAR(100),
+    MessageText VARCHAR(500),
+    SentAt DATETIME2,
+    IsRead BIT
+);
+
+
+-- 225.
+-- Use NVARCHAR for multilingual text.
+
+CREATE TABLE Users
+(
+    UserID INT,
+    DisplayName NVARCHAR(100),
+    Bio NVARCHAR(500),
+    BirthDate DATE,
+    CreatedAt DATETIME2,
+    IsActive BIT
+);
+
+
+-- 226.
+-- Use BIGINT for potentially very large whole numbers.
+
+CREATE TABLE Games
+(
+    GameID INT,
+    GameName VARCHAR(150),
+    Price DECIMAL(8,2),
+    ReleaseDate DATE,
+    DownloadCount BIGINT,
+    IsMultiplayer BIT
+);
+
+
+-- =========================================================
+-- NOT NULL / PRIMARY KEY / IDENTITY
+-- =========================================================
+
+-- 227.
+-- Require ProductID, ProductName, and Price.
+-- Description may be NULL.
+
+CREATE TABLE Products
+(
+    ProductID INT NOT NULL,
+    ProductName VARCHAR(100) NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+    Description VARCHAR(500)
+);
+
+
+-- 228.
+-- Create a PRIMARY KEY.
+
+CREATE TABLE Customers
+(
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100)
+);
+
+
+-- 229.
+-- Use IDENTITY to automatically generate EmployeeID.
+
+CREATE TABLE Employees
+(
+    EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Department VARCHAR(50),
+    Salary DECIMAL(10,2)
+);
+
+
+-- =========================================================
+-- UNIQUE
+-- =========================================================
+
+-- 230.
+-- Username and Email must both be unique.
+
+CREATE TABLE Accounts
+(
+    AccountID INT IDENTITY(1,1) PRIMARY KEY,
+    Username VARCHAR(50) NOT NULL UNIQUE,
+    Email VARCHAR(100) NOT NULL UNIQUE,
+    DisplayName VARCHAR(100)
+);
+
+
+-- =========================================================
+-- DEFAULT
+-- =========================================================
+
+-- 231.
+-- Status defaults to Active.
+-- Stock defaults to 0.
+
+CREATE TABLE Products
+(
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100) NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'Active',
+    Stock INT NOT NULL DEFAULT 0
+);
+
+
+-- =========================================================
+-- CHECK
+-- =========================================================
+
+-- 232.
+-- Prevent negative Price and Stock values.
+
+CREATE TABLE Products
+(
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100) NOT NULL,
+    Price DECIMAL(10,2) NOT NULL CHECK (Price >= 0),
+    Stock INT NOT NULL CHECK (Stock >= 0)
+);
+
+
+-- 233.
+-- Age must be between 5 and 100.
+-- GPA must be between 0 and 4.
+
+CREATE TABLE Students
+(
+    StudentID INT IDENTITY(1,1) PRIMARY KEY,
+    StudentName VARCHAR(100) NOT NULL,
+    Age INT NOT NULL CHECK (Age BETWEEN 5 AND 100),
+    GPA DECIMAL(3,2) NOT NULL CHECK (GPA BETWEEN 0 AND 4)
+);
+
+
+-- 234.
+-- Restrict Department and Status to specific values.
+
+CREATE TABLE Employees
+(
+    EmployeeID INT IDENTITY(1,1) PRIMARY KEY,
+    EmployeeName VARCHAR(100) NOT NULL,
+
+    Department VARCHAR(50) NOT NULL
+        CHECK (Department IN ('IT', 'Sales', 'HR')),
+
+    Salary DECIMAL(10,2) NOT NULL
+        CHECK (Salary > 0),
+
+    Status VARCHAR(20) NOT NULL
+        CHECK (Status IN ('Active', 'Inactive'))
+);
+
+
+-- 235.
+-- Combine PRIMARY KEY, UNIQUE, CHECK, DEFAULT and NOT NULL.
+
+CREATE TABLE Games
+(
+    GameID INT IDENTITY(1,1) PRIMARY KEY,
+    GameName VARCHAR(100) NOT NULL UNIQUE,
+
+    Price DECIMAL(8,2) NOT NULL
+        CHECK (Price >= 0),
+
+    Status VARCHAR(20) NOT NULL DEFAULT 'Active'
+        CHECK (Status IN ('Active', 'Inactive', 'Coming Soon'))
+);
+
+
+-- =========================================================
+-- NAMED CONSTRAINTS
+-- =========================================================
+
+-- 236.
+-- Named PRIMARY KEY and UNIQUE constraints.
+
+CREATE TABLE Categories
+(
+    CategoryID INT,
+    CategoryName VARCHAR(100) NOT NULL,
+
+    CONSTRAINT PK_Categories
+        PRIMARY KEY (CategoryID),
+
+    CONSTRAINT UQ_Categories_CategoryName
+        UNIQUE (CategoryName)
+);
+
+
+-- 237.
+-- Named PRIMARY KEY and CHECK constraints.
+
+CREATE TABLE Products
+(
+    ProductID INT,
+    ProductName VARCHAR(100) NOT NULL,
+    Price DECIMAL(10,2) NOT NULL,
+
+    CONSTRAINT PK_Products
+        PRIMARY KEY (ProductID),
+
+    CONSTRAINT CK_Products_Price
+        CHECK (Price >= 0)
+);
+
+
+-- =========================================================
+-- FOREIGN KEYS
+-- =========================================================
+
+-- 238.
+-- Departments already exists.
+-- Employees.DepartmentID references Departments.DepartmentID.
+
+CREATE TABLE Employees
+(
+    EmployeeID INT,
+    EmployeeName VARCHAR(100) NOT NULL,
+    DepartmentID INT NOT NULL,
+
+    CONSTRAINT PK_Employees
+        PRIMARY KEY (EmployeeID),
+
+    CONSTRAINT FK_Employees_Departments
+        FOREIGN KEY (DepartmentID)
+        REFERENCES Departments(DepartmentID)
+);
+
+
+-- 239.
+-- Customers already exists.
+-- Orders.CustomerID references Customers.CustomerID.
+
+CREATE TABLE Orders
+(
+    OrderID INT IDENTITY(1,1),
+    CustomerID INT NOT NULL,
+    OrderDate DATE NOT NULL,
+    Amount DECIMAL(10,2) NOT NULL,
+
+    CONSTRAINT PK_Orders
+        PRIMARY KEY (OrderID),
+
+    CONSTRAINT CK_Orders_Amount
+        CHECK (Amount > 0),
+
+    CONSTRAINT FK_Orders_Customers
+        FOREIGN KEY (CustomerID)
+        REFERENCES Customers(CustomerID)
+);
+
+
+-- 240.
+-- Table with two FOREIGN KEY constraints.
+
+CREATE TABLE OrderItems
+(
+    OrderItemID INT IDENTITY(1,1),
+    CustomerID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL,
+
+    CONSTRAINT PK_OrderItems
+        PRIMARY KEY (OrderItemID),
+
+    CONSTRAINT CK_OrderItems_Quantity
+        CHECK (Quantity > 0),
+
+    CONSTRAINT FK_OrderItems_Customers
+        FOREIGN KEY (CustomerID)
+        REFERENCES Customers(CustomerID),
+
+    CONSTRAINT FK_OrderItems_Products
+        FOREIGN KEY (ProductID)
+        REFERENCES Products(ProductID)
+);
+
+
+-- =========================================================
+-- COMPOSITE PRIMARY KEY
+-- =========================================================
+
+-- 241.
+-- StudentID + CourseID together form the PRIMARY KEY.
+
+CREATE TABLE StudentCourses
+(
+    StudentID INT NOT NULL,
+    CourseID INT NOT NULL,
+    EnrollDate DATE NOT NULL,
+
+    CONSTRAINT PK_StudentCourses
+        PRIMARY KEY (StudentID, CourseID)
+);
+
+
+-- =========================================================
+-- COMPOSITE UNIQUE
+-- =========================================================
+
+-- 242.
+-- The same RoomID + BookingDate combination cannot repeat.
+
+CREATE TABLE RoomBookings
+(
+    BookingID INT IDENTITY(1,1),
+    RoomID INT NOT NULL,
+    BookingDate DATE NOT NULL,
+    GuestName VARCHAR(100) NOT NULL,
+
+    CONSTRAINT PK_RoomBookings
+        PRIMARY KEY (BookingID),
+
+    CONSTRAINT UQ_RoomBookings_RoomDate
+        UNIQUE (RoomID, BookingDate)
+);
+
+
+-- =========================================================
+-- ALTER TABLE
+-- =========================================================
+
+-- 243.
+-- Add multiple columns to an existing table.
+
+ALTER TABLE Employees
+ADD
+    Email VARCHAR(100),
+    HireDate DATE;
+
+
+-- 244.
+-- Change an existing column definition.
+
+ALTER TABLE Employees
+ALTER COLUMN Email VARCHAR(200) NOT NULL;
+
+
+-- 245.
+-- Remove a column.
+
+ALTER TABLE Employees
+DROP COLUMN MiddleName;
+
+
+-- =========================================================
+-- ADD / DROP CONSTRAINT
+-- =========================================================
+
+-- 246.
+-- Add a UNIQUE constraint to an existing table.
+
+ALTER TABLE Employees
+ADD CONSTRAINT UQ_Employees_Email
+    UNIQUE (Email);
+
+
+-- 247.
+-- Remove the UNIQUE constraint.
+-- Email itself remains.
+
+ALTER TABLE Employees
+DROP CONSTRAINT UQ_Employees_Email;
+
+
+-- =========================================================
+-- DROP TABLE
+-- =========================================================
+
+-- 248.
+-- Completely remove the table and its data.
+
+DROP TABLE OldOrders;
+
+
+-- =========================================================
+-- TRUNCATE
+-- =========================================================
+
+-- 249.
+-- Remove every row but keep the table.
+-- In SQL Server this also normally resets IDENTITY.
+
+TRUNCATE TABLE TestData;
+
+
+-- =========================================================
+-- FINAL DATABASE DESIGN EXERCISE
+-- =========================================================
+
+-- 250.
+-- Departments already exists.
+--
+-- Combines:
+-- IDENTITY
+-- NOT NULL
+-- DEFAULT
+-- PRIMARY KEY
+-- UNIQUE
+-- FOREIGN KEY
+-- CHECK
+
+CREATE TABLE Employees
+(
+    EmployeeID INT IDENTITY(1,1),
+    EmployeeName VARCHAR(100) NOT NULL,
+    Email VARCHAR(150) NOT NULL,
+    DepartmentID INT NOT NULL,
+    Salary DECIMAL(10,2) NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'Active',
+
+    CONSTRAINT PK_Employees
+        PRIMARY KEY (EmployeeID),
+
+    CONSTRAINT UQ_Employees_Email
+        UNIQUE (Email),
+
+    CONSTRAINT FK_Employees_Departments
+        FOREIGN KEY (DepartmentID)
+        REFERENCES Departments(DepartmentID),
+
+    CONSTRAINT CK_Employees_Salary
+        CHECK (Salary > 0),
+
+    CONSTRAINT CK_Employees_Status
+        CHECK (Status IN ('Active', 'Inactive'))
+);
