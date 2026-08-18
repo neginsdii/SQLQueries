@@ -3349,3 +3349,138 @@ END;
 GO
 
 EXEC GetEmployeesByDeptAndSalary 'IT', 70000;
+
+CREATE PROCEDURE GetAllEmployees
+AS
+BEGIN
+    SELECT *
+    FROM Employees;
+END;
+GO
+
+EXEC GetAllEmployees;
+
+
+
+-- =============================================
+-- QUESTION 284
+-- Variable inside procedure:
+-- Return orders above the average order amount
+-- =============================================
+
+CREATE PROCEDURE GetAboveAverageOrders
+AS
+BEGIN
+    DECLARE @AvgAmount DECIMAL(10,2);
+
+    SELECT @AvgAmount = AVG(Amount)
+    FROM Orders;
+
+    SELECT *
+    FROM Orders
+    WHERE Amount > @AvgAmount;
+END;
+GO
+
+EXEC GetAboveAverageOrders;
+
+
+-- =============================================
+-- QUESTION 285
+-- Parameter + Variable:
+-- Return employees earning above their department average
+-- =============================================
+
+CREATE PROCEDURE GetAboveAverageSalaryByDepartment
+    @Department VARCHAR(50)
+AS
+BEGIN
+    DECLARE @AvgSalary DECIMAL(10,2);
+
+    SELECT @AvgSalary = AVG(Salary)
+    FROM Employees
+    WHERE Department = @Department;
+
+    SELECT *
+    FROM Employees
+    WHERE Department = @Department
+      AND Salary > @AvgSalary;
+END;
+GO
+
+EXEC GetAboveAverageSalaryByDepartment 'IT';
+
+
+-- =============================================
+-- QUESTION 286
+-- IF / ELSE: Check a salary
+-- =============================================
+
+CREATE PROCEDURE CheckSalary
+    @Salary INT
+AS
+BEGIN
+    IF @Salary > 70000
+    BEGIN
+        PRINT 'High Salary';
+    END
+    ELSE
+    BEGIN
+        PRINT 'Regular Salary';
+    END
+END;
+GO
+
+EXEC CheckSalary 85000;
+
+
+-- =============================================
+-- QUESTION 287
+-- IF / ELSE: Check an order amount
+-- =============================================
+
+CREATE PROCEDURE CheckOrderAmount
+    @Amount INT
+AS
+BEGIN
+    IF @Amount >= 500
+    BEGIN
+        PRINT 'Large Order';
+    END
+    ELSE
+    BEGIN
+        PRINT 'Small Order';
+    END
+END;
+GO
+
+EXEC CheckOrderAmount 500;
+
+
+-- =============================================
+-- QUESTION 288
+-- IF / ELSE with two parameters
+-- =============================================
+
+CREATE PROCEDURE CheckDepartmentSalary
+    @Department VARCHAR(50),
+    @MinSalary INT
+AS
+BEGIN
+    IF @MinSalary > 70000
+    BEGIN
+        SELECT *
+        FROM Employees
+        WHERE Department = @Department
+          AND Salary > @MinSalary;
+    END
+    ELSE
+    BEGIN
+        SELECT *
+        FROM Employees
+        WHERE Department = @Department;
+    END
+END;
+GO
+
+EXEC CheckDepartmentSalary 'IT', 80000;
