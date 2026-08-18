@@ -3484,3 +3484,102 @@ END;
 GO
 
 EXEC CheckDepartmentSalary 'IT', 80000;
+
+
+-- ============================================================
+-- Q289 - INSERT STORED PROCEDURE
+-- Add a new employee
+-- ============================================================
+
+CREATE PROCEDURE AddEmployee
+    @Name VARCHAR(50),
+    @Department VARCHAR(50),
+    @Salary INT
+AS
+BEGIN
+    INSERT INTO Employees (Name, Department, Salary)
+    VALUES (@Name, @Department, @Salary);
+END;
+GO
+
+EXEC AddEmployee 'David', 'IT', 75000;
+
+
+-- ============================================================
+-- Q290 - UPDATE STORED PROCEDURE
+-- Update a customer's city
+-- ============================================================
+
+CREATE PROCEDURE UpdateCustomerCity
+    @CustomerID INT,
+    @NewCity VARCHAR(50)
+AS
+BEGIN
+    UPDATE Customers
+    SET City = @NewCity
+    WHERE CustomerID = @CustomerID;
+END;
+GO
+
+EXEC UpdateCustomerCity 3, 'Vancouver';
+
+
+-- ============================================================
+-- Q291 - DELETE STORED PROCEDURE
+-- Delete an order using OrderID
+-- ============================================================
+
+CREATE PROCEDURE DeleteOrder
+    @OrderID INT
+AS
+BEGIN
+    DELETE FROM Orders
+    WHERE OrderID = @OrderID;
+END;
+GO
+
+EXEC DeleteOrder 5;
+
+
+-- ============================================================
+-- Q292 - OUTPUT PARAMETER
+-- Return the total number of orders
+-- ============================================================
+
+CREATE PROCEDURE GetOrderCount
+    @TotalOrders INT OUTPUT
+AS
+BEGIN
+    SELECT @TotalOrders = COUNT(*)
+    FROM Orders;
+END;
+GO
+
+DECLARE @Result INT;
+
+EXEC GetOrderCount @Result OUTPUT;
+
+SELECT @Result;
+
+
+-- ============================================================
+-- Q293 - INPUT + OUTPUT PARAMETERS
+-- Return the number of employees in a specified department
+-- ============================================================
+
+CREATE PROCEDURE GetDepartmentEmployeeCount
+    @Department VARCHAR(100),
+    @EmployeeCount INT OUTPUT
+AS
+BEGIN
+    SELECT @EmployeeCount = COUNT(EmployeeID)
+    FROM Employees
+    WHERE Department = @Department;
+END;
+GO
+
+DECLARE @Result INT;
+
+EXEC GetDepartmentEmployeeCount 'IT', @Result OUTPUT;
+
+SELECT @Result;
