@@ -3913,3 +3913,131 @@ INSERT INTO Customers (FirstName, LastName, Country, City)
 VALUES ('Emma', 'Brown', 'Canada', 'Toronto');
 
 ROLLBACK;
+
+-- ============================================================
+-- Q312 - MULTIPLE OPERATIONS + COMMIT
+-- Update two employees and save both changes
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Employees
+SET Salary = 90000
+WHERE EmployeeID = 1;
+
+UPDATE Employees
+SET Salary = 80000
+WHERE EmployeeID = 2;
+
+COMMIT;
+
+
+-- ============================================================
+-- Q313 - MULTIPLE OPERATIONS + ROLLBACK
+-- Make two changes, then undo both
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Customers
+SET City = 'Montreal'
+WHERE CustomerID = 1;
+
+UPDATE Employees
+SET Salary = 95000
+WHERE EmployeeID = 3;
+
+ROLLBACK;
+
+
+-- ============================================================
+-- Q314 - MULTIPLE OPERATIONS + COMMIT
+-- Insert employee + update customer
+-- Save both changes
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+INSERT INTO Employees (Name, Department, Salary)
+VALUES ('Sophia', 'Sales', 70000);
+
+UPDATE Customers
+SET City = 'Calgary'
+WHERE CustomerID = 3;
+
+COMMIT;
+
+
+-- ============================================================
+-- Q315 - CONDITIONAL TRANSACTION
+-- Commit if salary >= 60000, otherwise rollback
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Employees
+SET Salary = 75000
+WHERE EmployeeID = 2;
+
+IF (
+    SELECT Salary
+    FROM Employees
+    WHERE EmployeeID = 2
+) >= 60000
+BEGIN
+    COMMIT;
+END
+ELSE
+BEGIN
+    ROLLBACK;
+END;
+
+
+-- ============================================================
+-- Q316 - CONDITIONAL TRANSACTION
+-- Commit if salary >= 50000, otherwise rollback
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Employees
+SET Salary = 40000
+WHERE EmployeeID = 3;
+
+IF (
+    SELECT Salary
+    FROM Employees
+    WHERE EmployeeID = 3
+) >= 50000
+BEGIN
+    COMMIT;
+END
+ELSE
+BEGIN
+    ROLLBACK;
+END;
+
+
+-- ============================================================
+-- Q317 - CONDITIONAL TRANSACTION + EXISTS
+-- Insert Daniel
+-- Commit if Daniel exists, otherwise rollback
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+INSERT INTO Employees (Name, Department, Salary)
+VALUES ('Daniel', 'IT', 72000);
+
+IF EXISTS (
+    SELECT 1
+    FROM Employees
+    WHERE Name = 'Daniel'
+)
+BEGIN
+    COMMIT;
+END
+ELSE
+BEGIN
+    ROLLBACK;
+END;
