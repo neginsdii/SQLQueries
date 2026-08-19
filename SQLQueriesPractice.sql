@@ -4041,3 +4041,230 @@ ELSE
 BEGIN
     ROLLBACK;
 END;
+
+
+-- ============================================================
+-- Q318 - BASIC TRY...CATCH
+-- Handle a divide-by-zero error
+-- ============================================================
+
+BEGIN TRY
+    SELECT 100 / 0;
+END TRY
+BEGIN CATCH
+    PRINT 'An error occurred';
+END CATCH;
+
+
+-- ============================================================
+-- Q319 - BASIC TRY...CATCH
+-- No error occurs, so CATCH is skipped
+-- ============================================================
+
+BEGIN TRY
+    SELECT 50 / 5;
+END TRY
+BEGIN CATCH
+    PRINT 'Calculation failed';
+END CATCH;
+
+
+-- ============================================================
+-- Q320 - TRY...CATCH WITH INSERT
+-- Try to insert an employee
+-- ============================================================
+
+BEGIN TRY
+
+    INSERT INTO Employees (Name, Department, Salary)
+    VALUES ('Alex', 'IT', 70000);
+
+END TRY
+BEGIN CATCH
+
+    PRINT 'Employee could not be added';
+
+END CATCH;
+
+
+-- ============================================================
+-- Q321 - ERROR_MESSAGE()
+-- Return the actual SQL Server error message
+-- ============================================================
+
+BEGIN TRY
+
+    SELECT 200 / 0;
+
+END TRY
+BEGIN CATCH
+
+    SELECT ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q322 - ERROR_NUMBER() + ERROR_MESSAGE()
+-- Return the error number and error message
+-- ============================================================
+
+BEGIN TRY
+
+    SELECT 100 / 0;
+
+END TRY
+BEGIN CATCH
+
+    SELECT
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q323 - TRY...CATCH + TRANSACTION
+-- Update an employee
+-- COMMIT if successful
+-- ROLLBACK if an error occurs
+-- ============================================================
+
+BEGIN TRY
+
+    BEGIN TRANSACTION;
+
+    UPDATE Employees
+    SET Salary = 88000
+    WHERE EmployeeID = 1;
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    ROLLBACK;
+
+    SELECT ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q324 - TRY...CATCH + MULTIPLE OPERATIONS
+-- Update employee + customer
+-- ============================================================
+
+BEGIN TRY
+
+    BEGIN TRANSACTION;
+
+    UPDATE Employees
+    SET Salary = 92000
+    WHERE EmployeeID = 2;
+
+    UPDATE Customers
+    SET City = 'Toronto'
+    WHERE CustomerID = 3;
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    ROLLBACK;
+
+    SELECT ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q325 - TRANSACTION + INSERT + UPDATE
+-- Return error number and message if something fails
+-- ============================================================
+
+BEGIN TRY
+
+    BEGIN TRANSACTION;
+
+    INSERT INTO Employees (Name, Department, Salary)
+    VALUES ('Laura', 'HR', 68000);
+
+    UPDATE Customers
+    SET City = 'Vancouver'
+    WHERE CustomerID = 2;
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    ROLLBACK;
+
+    SELECT
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q326 - SAFER TRANSACTION WITH XACT_STATE()
+-- Check that a transaction exists before rolling back
+-- ============================================================
+
+BEGIN TRY
+
+    BEGIN TRANSACTION;
+
+    UPDATE Employees
+    SET Salary = 97000
+    WHERE EmployeeID = 3;
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    IF XACT_STATE() <> 0
+    BEGIN
+        ROLLBACK;
+    END
+
+    SELECT ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
+
+
+-- ============================================================
+-- Q327 - FINAL ERROR HANDLING
+-- INSERT + UPDATE + XACT_STATE + ERROR DETAILS
+-- ============================================================
+
+BEGIN TRY
+
+    BEGIN TRANSACTION;
+
+    INSERT INTO Employees (Name, Department, Salary)
+    VALUES ('Robert', 'Sales', 74000);
+
+    UPDATE Customers
+    SET City = 'Toronto'
+    WHERE CustomerID = 1;
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    IF XACT_STATE() <> 0
+    BEGIN
+        ROLLBACK;
+    END
+
+    SELECT
+        ERROR_NUMBER() AS ErrorNumber,
+        ERROR_MESSAGE() AS ErrorMessage;
+
+END CATCH;
