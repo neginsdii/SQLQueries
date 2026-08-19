@@ -3583,3 +3583,246 @@ DECLARE @Result INT;
 EXEC GetDepartmentEmployeeCount 'IT', @Result OUTPUT;
 
 SELECT @Result;
+
+
+-- ============================================================
+-- Q294 - BASIC SCALAR FUNCTION
+-- Return a number multiplied by 2
+-- ============================================================
+
+CREATE FUNCTION CalculateDouble
+(
+    @Number INT
+)
+RETURNS INT
+AS
+BEGIN
+    RETURN @Number * 2;
+END;
+GO
+
+SELECT dbo.CalculateDouble(10);
+
+
+-- ============================================================
+-- Q295 - SCALAR FUNCTION
+-- Calculate 13% tax
+-- ============================================================
+
+CREATE FUNCTION CalculateTax
+(
+    @Price DECIMAL(10,2)
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    RETURN 0.13 * @Price;
+END;
+GO
+
+SELECT dbo.CalculateTax(100);
+
+
+-- ============================================================
+-- Q296 - SCALAR FUNCTION
+-- Calculate annual salary from monthly salary
+-- ============================================================
+
+CREATE FUNCTION CalculateAnnualSalary
+(
+    @MonthlySalary DECIMAL(10,2)
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    RETURN @MonthlySalary * 12;
+END;
+GO
+
+SELECT dbo.CalculateAnnualSalary(5000);
+
+
+-- ============================================================
+-- Q297 - MULTIPLE PARAMETERS
+-- Calculate total price
+-- ============================================================
+
+CREATE FUNCTION CalculateTotalPrice
+(
+    @Price DECIMAL(10,2),
+    @Quantity INT
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    RETURN @Price * @Quantity;
+END;
+GO
+
+SELECT dbo.CalculateTotalPrice(25, 4);
+
+
+-- ============================================================
+-- Q298 - MULTIPLE PARAMETERS
+-- Calculate discount amount
+-- ============================================================
+
+CREATE FUNCTION CalculateDiscount
+(
+    @Price DECIMAL(10,2),
+    @DiscountPercent DECIMAL(5,2)
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    RETURN @Price * @DiscountPercent / 100;
+END;
+GO
+
+SELECT dbo.CalculateDiscount(200, 10);
+
+
+-- ============================================================
+-- Q299 - SCALAR FUNCTION + IF / ELSE
+-- Return Large or Small depending on order amount
+-- ============================================================
+
+CREATE FUNCTION GetOrderSize
+(
+    @Amount INT
+)
+RETURNS VARCHAR(50)
+AS
+BEGIN
+    IF @Amount >= 500
+    BEGIN
+        RETURN 'Large';
+    END
+    ELSE
+    BEGIN
+        RETURN 'Small';
+    END
+END;
+GO
+
+SELECT dbo.GetOrderSize(700);
+
+
+-- ============================================================
+-- Q300 - TABLE-VALUED FUNCTION
+-- Return orders belonging to a customer
+-- ============================================================
+
+CREATE FUNCTION GetOrdersByCustomer
+(
+    @CustomerID INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT *
+    FROM Orders
+    WHERE CustomerID = @CustomerID
+);
+GO
+
+SELECT *
+FROM dbo.GetOrdersByCustomer(3);
+
+
+-- ============================================================
+-- Q301 - TABLE-VALUED FUNCTION
+-- Return employees above a minimum salary
+-- ============================================================
+
+CREATE FUNCTION GetEmployeesAboveSalary
+(
+    @MinSalary INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT *
+    FROM Employees
+    WHERE Salary > @MinSalary
+);
+GO
+
+SELECT *
+FROM dbo.GetEmployeesAboveSalary(70000);
+
+
+-- ============================================================
+-- Q302 - TABLE-VALUED FUNCTION + MULTIPLE PARAMETERS
+-- Return employees from a department above a minimum salary
+-- ============================================================
+
+CREATE FUNCTION GetEmployeesByDeptAndSalary
+(
+    @Department VARCHAR(50),
+    @MinSalary INT
+)
+RETURNS TABLE
+AS
+RETURN
+(
+    SELECT *
+    FROM Employees
+    WHERE Department = @Department
+      AND Salary > @MinSalary
+);
+GO
+
+SELECT *
+FROM dbo.GetEmployeesByDeptAndSalary('IT', 70000);
+
+
+-- ============================================================
+-- Q303 - SCALAR FUNCTION + TABLE + AGGREGATE
+-- Return average salary for a department
+-- ============================================================
+
+CREATE FUNCTION GetDepartmentAverageSalary
+(
+    @Department VARCHAR(50)
+)
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    DECLARE @Result DECIMAL(10,2);
+
+    SELECT @Result = AVG(Salary)
+    FROM Employees
+    WHERE Department = @Department;
+
+    RETURN @Result;
+END;
+GO
+
+SELECT dbo.GetDepartmentAverageSalary('IT');
+
+
+-- ============================================================
+-- Q304 - USE A SCALAR FUNCTION WITH TABLE COLUMNS
+-- Calculate annual salary for every employee
+-- ============================================================
+
+SELECT
+    Name,
+    Salary,
+    dbo.CalculateAnnualSalary(Salary) AS AnnualSalary
+FROM Employees;
+
+
+-- ============================================================
+-- Q305 - USE A SCALAR FUNCTION WITH TABLE COLUMNS
+-- Classify every order as Large or Small
+-- ============================================================
+
+SELECT
+    OrderID,
+    Amount,
+    dbo.GetOrderSize(Amount) AS OrderSize
+FROM Orders;
