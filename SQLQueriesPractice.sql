@@ -3826,3 +3826,90 @@ SELECT
     Amount,
     dbo.GetOrderSize(Amount) AS OrderSize
 FROM Orders;
+
+
+-- ============================================================
+-- Q306 - BASIC TRANSACTION + COMMIT
+-- Change EmployeeID 3 salary to 85000
+-- Permanently save the change
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Employees
+SET Salary = 85000
+WHERE EmployeeID = 3;
+
+COMMIT;
+
+
+-- ============================================================
+-- Q307 - BASIC TRANSACTION + COMMIT
+-- Change CustomerID 2 city to Ottawa
+-- Permanently save the change
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Customers
+SET City = 'Ottawa'
+WHERE CustomerID = 2;
+
+COMMIT;
+
+
+-- ============================================================
+-- Q308 - BASIC TRANSACTION + COMMIT
+-- Insert a new employee
+-- Permanently save the employee
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+INSERT INTO Employees (Name, Department, Salary)
+VALUES ('Michael', 'HR', 65000);
+
+COMMIT;
+
+
+-- ============================================================
+-- Q309 - ROLLBACK
+-- Change EmployeeID 2 salary to 95000
+-- Then undo the change
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+UPDATE Employees
+SET Salary = 95000
+WHERE EmployeeID = 2;
+
+ROLLBACK;
+
+
+-- ============================================================
+-- Q310 - ROLLBACK
+-- Delete CustomerID 4
+-- Then undo the deletion
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+DELETE FROM Customers
+WHERE CustomerID = 4;
+
+ROLLBACK;
+
+
+-- ============================================================
+-- Q311 - ROLLBACK
+-- Insert a new customer
+-- Then undo the insertion
+-- ============================================================
+
+BEGIN TRANSACTION;
+
+INSERT INTO Customers (FirstName, LastName, Country, City)
+VALUES ('Emma', 'Brown', 'Canada', 'Toronto');
+
+ROLLBACK;
