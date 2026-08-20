@@ -4268,3 +4268,209 @@ BEGIN CATCH
         ERROR_MESSAGE() AS ErrorMessage;
 
 END CATCH;
+
+-- ============================================================
+-- Q328 - BASIC INDEX
+-- Index Employees by Department
+-- ============================================================
+
+CREATE INDEX IX_Employees_Department
+ON Sales.Employees (Department);
+
+SELECT *
+FROM Sales.Employees
+WHERE Department = 'IT';
+
+
+-- ============================================================
+-- Q329 - BASIC INDEX
+-- Index Customers by Country
+-- ============================================================
+
+CREATE INDEX IX_Customers_Country
+ON Sales.Customers (Country);
+
+SELECT *
+FROM Sales.Customers
+WHERE Country = 'Canada';
+
+
+-- ============================================================
+-- Q330 - BASIC INDEX
+-- Index Orders by Amount
+-- ============================================================
+
+CREATE INDEX IX_Orders_Amount
+ON Sales.Orders (Amount);
+
+SELECT *
+FROM Sales.Orders
+WHERE Amount > 500;
+
+
+-- ============================================================
+-- Q331 - NONCLUSTERED INDEX
+-- Index Employees by Salary
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Employees_Salary
+ON Sales.Employees (Salary);
+
+SELECT *
+FROM Sales.Employees
+WHERE Salary > 70000;
+
+
+-- ============================================================
+-- Q332 - NONCLUSTERED INDEX
+-- Index Customers by City
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Customers_City
+ON Sales.Customers (City);
+
+SELECT *
+FROM Sales.Customers
+WHERE City = 'Toronto';
+
+
+-- ============================================================
+-- Q333 - NONCLUSTERED INDEX
+-- Index Orders by CustomerID
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Orders_CustomerID
+ON Sales.Orders (CustomerID);
+
+SELECT *
+FROM Sales.Orders
+WHERE CustomerID = 3;
+
+
+-- ============================================================
+-- Q334 - COMPOSITE INDEX
+-- Department first, Salary second
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Employees_Department_Salary
+ON Sales.Employees (Department, Salary);
+
+SELECT *
+FROM Sales.Employees
+WHERE Department = 'IT'
+  AND Salary > 70000;
+
+
+-- ============================================================
+-- Q335 - COMPOSITE INDEX
+-- Country first, City second
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Customers_Country_City
+ON Sales.Customers (Country, City);
+
+SELECT *
+FROM Sales.Customers
+WHERE Country = 'Canada'
+  AND City = 'Toronto';
+
+
+-- ============================================================
+-- Q336 - COMPOSITE INDEX
+-- CustomerID first, Amount second
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Orders_CustomerID_Amount
+ON Sales.Orders (CustomerID, Amount);
+
+SELECT *
+FROM Sales.Orders
+WHERE CustomerID = 3
+  AND Amount > 300;
+
+
+-- ============================================================
+-- Q337 - UNIQUE INDEX
+-- Email values cannot be duplicated
+-- Assumes Employees has an Email column
+-- ============================================================
+
+CREATE UNIQUE INDEX IX_Employees_Email
+ON Sales.Employees (Email);
+
+SELECT *
+FROM Sales.Employees
+WHERE Email = 'john@email.com';
+
+
+-- ============================================================
+-- Q338 - UNIQUE INDEX
+-- Username values cannot be duplicated
+-- Assumes Customers has a Username column
+-- ============================================================
+
+CREATE UNIQUE INDEX IX_Customers_Username
+ON Sales.Customers (Username);
+
+SELECT *
+FROM Sales.Customers
+WHERE Username = 'sarah123';
+
+
+-- ============================================================
+-- Q339 - DROP INDEX
+-- Remove Department index from Employees
+-- ============================================================
+
+DROP INDEX IX_Employees_Department
+ON Sales.Employees;
+
+
+-- ============================================================
+-- Q340 - DROP COMPOSITE INDEX
+-- Remove Country + City index
+-- ============================================================
+
+DROP INDEX IX_Customers_Country_City
+ON Sales.Customers;
+
+
+-- ============================================================
+-- Q341 - CHOOSE THE RIGHT INDEX
+--
+-- Query pattern:
+-- CustomerID = exact value
+-- Amount > range
+--
+-- Equality column first, range column second
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Orders_CustomerID_Amount
+ON Sales.Orders (CustomerID, Amount);
+
+
+-- Query this index was designed to help:
+
+SELECT *
+FROM Sales.Orders
+WHERE CustomerID = 5
+  AND Amount > 500;
+
+
+-- ============================================================
+-- Q342 - CHOOSE INDEX FOR WHERE + ORDER BY
+--
+-- Filter by Department
+-- Sort by Salary
+-- ============================================================
+
+CREATE NONCLUSTERED INDEX IX_Employees_Department_Salary
+ON Sales.Employees (Department, Salary);
+
+
+-- Query this index was designed to help:
+
+SELECT *
+FROM Sales.Employees
+WHERE Department = 'IT'
+ORDER BY Salary;
