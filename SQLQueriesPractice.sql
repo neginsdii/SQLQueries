@@ -4474,3 +4474,151 @@ SELECT *
 FROM Sales.Employees
 WHERE Department = 'IT'
 ORDER BY Salary;
+
+
+-- ============================================================
+-- Q343 - AFTER INSERT
+-- Print a message when a customer is inserted
+-- ============================================================
+
+CREATE TRIGGER trg_CustomerInserted
+ON Sales.Customers
+AFTER INSERT
+AS
+BEGIN
+    PRINT 'New customer added';
+END;
+
+
+-- ============================================================
+-- Q344 - AFTER INSERT
+-- Print a message when an order is inserted
+-- ============================================================
+
+CREATE TRIGGER trg_OrderInserted
+ON Sales.Orders
+AFTER INSERT
+AS
+BEGIN
+    PRINT 'New order created';
+END;
+
+
+-- ============================================================
+-- Q345 - AFTER INSERT
+-- Print a message when an employee is inserted
+-- ============================================================
+
+CREATE TRIGGER trg_EmployeeInserted
+ON Sales.Employees
+AFTER INSERT
+AS
+BEGIN
+    PRINT 'Employee successfully added';
+END;
+
+
+-- ============================================================
+-- Q346 - AFTER UPDATE
+-- Print a message when a customer is updated
+-- ============================================================
+
+CREATE TRIGGER trg_CustomerUpdated
+ON Sales.Customers
+AFTER UPDATE
+AS
+BEGIN
+    PRINT 'Customer information updated';
+END;
+
+
+-- ============================================================
+-- Q347 - AFTER UPDATE
+-- Print a message when an order is updated
+-- ============================================================
+
+CREATE TRIGGER trg_OrderUpdated
+ON Sales.Orders
+AFTER UPDATE
+AS
+BEGIN
+    PRINT 'Order updated';
+END;
+
+
+-- ============================================================
+-- Q348 - AFTER DELETE
+-- Print a message when a customer is deleted
+-- ============================================================
+
+CREATE TRIGGER trg_CustomerDeleted
+ON Sales.Customers
+AFTER DELETE
+AS
+BEGIN
+    PRINT 'Customer deleted';
+END;
+
+
+-- ============================================================
+-- Q349 - AFTER DELETE
+-- Print a message when an order is deleted
+-- ============================================================
+
+CREATE TRIGGER trg_OrderDeleted
+ON Sales.Orders
+AFTER DELETE
+AS
+BEGIN
+    PRINT 'Order deleted';
+END;
+
+
+-- ============================================================
+-- Q350 - INSERTED TABLE
+-- Show newly inserted employee row(s)
+-- ============================================================
+
+CREATE TRIGGER trg_ShowNewEmployee
+ON Sales.Employees
+AFTER INSERT
+AS
+BEGIN
+    SELECT *
+    FROM inserted;
+END;
+
+
+-- ============================================================
+-- Q351 - DELETED TABLE
+-- Show deleted customer row(s)
+-- ============================================================
+
+CREATE TRIGGER trg_ShowDeletedCustomer
+ON Sales.Customers
+AFTER DELETE
+AS
+BEGIN
+    SELECT *
+    FROM deleted;
+END;
+
+
+-- ============================================================
+-- Q352 - INSERTED + DELETED
+-- Show old and new salary after an employee is updated
+-- ============================================================
+
+CREATE TRIGGER trg_ShowEmployeeSalaryChange
+ON Sales.Employees
+AFTER UPDATE
+AS
+BEGIN
+    SELECT
+        i.Name,
+        d.Salary AS OldSalary,
+        i.Salary AS NewSalary
+    FROM deleted d
+    INNER JOIN inserted i
+        ON d.EmployeeID = i.EmployeeID;
+END;
